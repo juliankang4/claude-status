@@ -76,8 +76,13 @@ actor StatusService {
         }
     }
 
+    private let cacheMaxAge: TimeInterval = 3600 // 1 hour
+
     private func loadCache<T: Decodable>(file: URL, as type: T.Type) -> T? {
-        guard let data = try? Data(contentsOf: file) else { return nil }
+        guard let attrs = try? FileManager.default.attributesOfItem(atPath: file.path),
+              let modified = attrs[.modificationDate] as? Date,
+              Date().timeIntervalSince(modified) < cacheMaxAge,
+              let data = try? Data(contentsOf: file) else { return nil }
         return try? JSONDecoder().decode(type, from: data)
     }
 }

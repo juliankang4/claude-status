@@ -10,9 +10,7 @@ BUILD_DIR="$PROJECT_DIR/Build"
 APP_DIR="$BUILD_DIR/$BUNDLE_NAME"
 
 echo "=== Building ClaudeStatus ==="
-swift build -c release 2>&1
-
-BIN_PATH=$(swift build -c release --show-bin-path 2>/dev/null)
+BIN_PATH=$(swift build -c release --show-bin-path)
 BINARY="$BIN_PATH/ClaudeStatus"
 
 echo "=== Creating app bundle ==="

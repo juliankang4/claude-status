@@ -42,7 +42,7 @@ final class StatusMonitor {
     func start() {
         // Prevent App Nap (not system sleep)
         activityToken = ProcessInfo.processInfo.beginActivity(
-            options: [.idleSystemSleepDisabled, .suddenTerminationDisabled],
+            options: .userInitiatedAllowingIdleSystemSleep,
             reason: "Status monitoring requires periodic updates"
         )
 

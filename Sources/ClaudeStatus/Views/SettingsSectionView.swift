@@ -69,7 +69,7 @@ struct SettingsSectionView: View {
             }
             .buttonStyle(.plain)
             .onHover { hovering in
-                if hovering { NSCursor.pointingHand.set() } else { NSCursor.arrow.set() }
+                if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
             }
         }
         .padding(.horizontal, 16)

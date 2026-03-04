@@ -4,7 +4,7 @@ import SwiftUI
 struct ClaudeStatusApp: App {
     @State private var monitor = StatusMonitor()
     @State private var settings = AppSettings()
-    private let notificationService = NotificationService()
+    @State private var notificationService = NotificationService()
     @State private var didSetup = false
 
     var body: some Scene {

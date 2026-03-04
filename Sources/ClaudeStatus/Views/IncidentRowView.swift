@@ -33,9 +33,9 @@ struct IncidentRowView: View {
         .contentShape(Rectangle())
         .onHover { hovering in
             if hovering {
-                NSCursor.pointingHand.set()
+                NSCursor.pointingHand.push()
             } else {
-                NSCursor.arrow.set()
+                NSCursor.pop()
             }
         }
     }

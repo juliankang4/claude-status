@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.4] - 2026-03-05
+
+### Fixed
+- Stability and resource management fixes from third code review
+
 ## [0.0.3] - 2026-03-05
 
 ### Fixed
