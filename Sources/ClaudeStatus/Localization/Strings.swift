@@ -12,7 +12,6 @@ enum L10n {
         case title
         case recentIncidents
         case noIncidents
-        case noIncidentData
         case noData
         case lastChecked
         case offline
@@ -24,7 +23,6 @@ enum L10n {
         case language
         case notificationTitle
         case thirtyDays
-        case launchAtLogin
         case launchAtLoginOn
         case launchAtLoginOff
         case quit
@@ -34,14 +32,11 @@ enum L10n {
         case refreshInterval
         case serviceAlerts
         case updateAvailable
-        case networkOffline
-
         var en: String {
             switch self {
             case .title: "Claude Service Status"
             case .recentIncidents: "Recent Incidents"
             case .noIncidents: "No incidents"
-            case .noIncidentData: "No incident data"
             case .noData: "Unable to fetch data"
             case .lastChecked: "Last checked"
             case .offline: "Offline (showing cache)"
@@ -53,7 +48,6 @@ enum L10n {
             case .language: "Language"
             case .notificationTitle: "Claude Status Changed"
             case .thirtyDays: "30d"
-            case .launchAtLogin: "Launch at Login"
             case .launchAtLoginOn: "Launch at Login: On"
             case .launchAtLoginOff: "Launch at Login: Off"
             case .quit: "Quit Claude Status"
@@ -63,7 +57,6 @@ enum L10n {
             case .refreshInterval: "Refresh interval"
             case .serviceAlerts: "Service alerts"
             case .updateAvailable: "Update available"
-            case .networkOffline: "Network offline"
             }
         }
 
@@ -72,7 +65,6 @@ enum L10n {
             case .title: "Claude 서비스 상태"
             case .recentIncidents: "최근 장애"
             case .noIncidents: "장애 없음"
-            case .noIncidentData: "장애 정보 없음"
             case .noData: "데이터를 가져올 수 없습니다"
             case .lastChecked: "마지막 확인"
             case .offline: "연결 실패 (캐시 표시중)"
@@ -84,7 +76,6 @@ enum L10n {
             case .language: "언어"
             case .notificationTitle: "Claude 상태 변경"
             case .thirtyDays: "30일"
-            case .launchAtLogin: "시작프로그램"
             case .launchAtLoginOn: "시작프로그램: 켜짐"
             case .launchAtLoginOff: "시작프로그램: 꺼짐"
             case .quit: "종료"
@@ -94,7 +85,6 @@ enum L10n {
             case .refreshInterval: "갱신 주기"
             case .serviceAlerts: "서비스별 알림"
             case .updateAvailable: "업데이트 가능"
-            case .networkOffline: "네트워크 연결 없음"
             }
         }
     }

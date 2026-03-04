@@ -21,16 +21,6 @@ enum StatusMapping {
         }
     }
 
-    static func menuBarIcon(for indicator: StatusIndicator, online: Bool) -> String {
-        guard online else { return "☁️❓" }
-        switch indicator {
-        case .none: return "☁️✅"
-        case .minor: return "☁️⚠️"
-        case .major, .critical: return "☁️❌"
-        case .unknown: return "☁️❓"
-        }
-    }
-
     static func incidentColor(for status: IncidentStatus) -> Color {
         switch status {
         case .resolved, .postmortem: .green

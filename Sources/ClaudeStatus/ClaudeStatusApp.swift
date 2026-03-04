@@ -65,7 +65,7 @@ struct ClaudeStatusApp: App {
     // MARK: - Global Hotkey (Cmd+Shift+C)
 
     private func registerGlobalHotkey() {
-        NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
+        let handler: (NSEvent) -> Void = { event in
             let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
             if event.keyCode == AppConstants.hotkeyKeyCode
                 && flags == [.command, .shift] {
@@ -73,6 +73,12 @@ struct ClaudeStatusApp: App {
                     togglePopover()
                 }
             }
+        }
+
+        NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: handler)
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            handler(event)
+            return event
         }
     }
 

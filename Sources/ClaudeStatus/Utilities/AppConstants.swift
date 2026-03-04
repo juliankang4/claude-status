@@ -22,7 +22,7 @@ enum AppConstants {
 
     // MARK: - GitHub
     static let githubRepo = "juliankang4/claude-status"
-    static let currentVersion = "0.0.5"
+    static let currentVersion: String = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
     static let releasesAPIURL = URL(string: "https://api.github.com/repos/juliankang4/claude-status/releases/latest")!
 
     // MARK: - Keyboard Shortcut

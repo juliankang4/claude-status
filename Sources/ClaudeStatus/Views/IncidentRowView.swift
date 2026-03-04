@@ -104,12 +104,7 @@ struct IncidentRowView: View {
     }
 
     private func cleanHTML(_ html: String) -> String {
-        var text = html
-        // Remove HTML tags
-        while let range = text.range(of: "<[^>]+>", options: .regularExpression) {
-            text.replaceSubrange(range, with: "")
-        }
-        // Decode common entities
+        var text = html.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
         text = text.replacingOccurrences(of: "&amp;", with: "&")
         text = text.replacingOccurrences(of: "&lt;", with: "<")
         text = text.replacingOccurrences(of: "&gt;", with: ">")
