@@ -20,9 +20,6 @@ All notable changes to this project will be documented in this file.
 - README rewritten in English with Korean section at bottom
 - All commit messages in English
 
-### Removed
-- CLAUDE.md and DEVLOG.md from repository (moved to .gitignore)
-
 ## [0.0.0] - 2026-03-05
 
 ### Added
