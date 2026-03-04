@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.6] - 2026-03-05
+
+### Fixed
+- Code review fixes: semantic version comparison, local hotkey monitor, dead code cleanup
+
 ## [0.0.5] - 2026-03-05
 
 ### Added
