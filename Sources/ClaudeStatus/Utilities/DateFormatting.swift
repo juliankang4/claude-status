@@ -52,6 +52,11 @@ enum DateFormatting {
         return formatter.string(from: Date())
     }
 
+    static func time(_ date: Date, language: AppLanguage) -> String {
+        let formatter = language == .korean ? timeFormatterKO : timeFormatterEN
+        return formatter.string(from: date)
+    }
+
     // MARK: - Duration
 
     static func duration(from startString: String, to endDate: Date?, language: AppLanguage) -> String? {

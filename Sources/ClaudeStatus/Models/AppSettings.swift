@@ -4,23 +4,30 @@ import SwiftUI
 @Observable
 @MainActor
 final class AppSettings {
+    private enum Key {
+        static let notificationsEnabled = "notificationsEnabled"
+        static let language = "language"
+        static let mutedServices = "mutedServices"
+        static let refreshInterval = "refreshInterval"
+    }
+
     var notificationsEnabled: Bool {
-        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled") }
+        didSet { UserDefaults.standard.set(notificationsEnabled, forKey: Key.notificationsEnabled) }
     }
 
     var language: AppLanguage {
-        didSet { UserDefaults.standard.set(language.rawValue, forKey: "language") }
+        didSet { UserDefaults.standard.set(language.rawValue, forKey: Key.language) }
     }
 
     var mutedServices: Set<String> {
         didSet {
-            UserDefaults.standard.set(Array(mutedServices), forKey: "mutedServices")
+            UserDefaults.standard.set(Array(mutedServices), forKey: Key.mutedServices)
         }
     }
 
     var refreshInterval: TimeInterval {
         didSet {
-            UserDefaults.standard.set(refreshInterval, forKey: "refreshInterval")
+            UserDefaults.standard.set(refreshInterval, forKey: Key.refreshInterval)
         }
     }
 
@@ -28,18 +35,18 @@ final class AppSettings {
         let defaults = UserDefaults.standard
         let systemLang = Locale.preferredLanguages.first?.hasPrefix("ko") == true ? "ko" : "en"
         defaults.register(defaults: [
-            "notificationsEnabled": true,
-            "language": systemLang,
-            "refreshInterval": AppConstants.defaultRefreshInterval
+            Key.notificationsEnabled: true,
+            Key.language: systemLang,
+            Key.refreshInterval: AppConstants.defaultRefreshInterval
         ])
 
-        self.notificationsEnabled = defaults.bool(forKey: "notificationsEnabled")
-        self.language = AppLanguage(rawValue: defaults.string(forKey: "language") ?? "en") ?? .english
+        self.notificationsEnabled = defaults.bool(forKey: Key.notificationsEnabled)
+        self.language = AppLanguage(rawValue: defaults.string(forKey: Key.language) ?? "en") ?? .english
 
-        let savedInterval = defaults.double(forKey: "refreshInterval")
+        let savedInterval = defaults.double(forKey: Key.refreshInterval)
         self.refreshInterval = savedInterval > 0 ? savedInterval : AppConstants.defaultRefreshInterval
 
-        if let saved = defaults.array(forKey: "mutedServices") as? [String] {
+        if let saved = defaults.array(forKey: Key.mutedServices) as? [String] {
             self.mutedServices = Set(saved)
         } else {
             self.mutedServices = []

@@ -121,7 +121,8 @@ struct SettingsSectionView: View {
             // Update available
             if let release = monitor.latestRelease {
                 Button {
-                    if let url = URL(string: release.url) {
+                    if let url = URL(string: release.url),
+                       url.scheme?.lowercased() == "https" {
                         NSWorkspace.shared.open(url)
                     }
                 } label: {

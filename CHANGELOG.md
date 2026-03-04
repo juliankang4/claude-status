@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.7] - 2026-03-05
+
+### Fixed
+- Last checked time now shows actual API refresh time instead of current render time
+- Uptime bar date calculation unified to UTC (fixes off-by-one in non-UTC timezones)
+- External URLs validated for HTTPS scheme before opening
+- Removed force unwrap on resolvedAt in incident detail view
+- UserDefaults keys consolidated into private enum constants
+
 ## [0.0.6] - 2026-03-05
 
 ### Fixed

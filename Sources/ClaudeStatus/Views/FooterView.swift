@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FooterView: View {
     let isOnline: Bool
+    let lastRefresh: Date?
     let language: AppLanguage
     let onRefresh: () -> Void
 
@@ -9,13 +10,15 @@ struct FooterView: View {
         VStack(alignment: .leading, spacing: 6) {
             // Status time
             if isOnline {
-                Text("\(L10n.get(.lastChecked, language: language)): \(DateFormatting.currentTime(language: language))")
+                let checked = lastRefresh.map { DateFormatting.time($0, language: language) } ?? "-"
+                Text("\(L10n.get(.lastChecked, language: language)): \(checked)")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
             } else {
                 HStack(spacing: 4) {
                     Text("⚠️")
-                    Text("\(L10n.get(.offline, language: language)) — \(DateFormatting.currentTime(language: language))")
+                    let checked = lastRefresh.map { DateFormatting.time($0, language: language) } ?? "-"
+                    Text("\(L10n.get(.offline, language: language)) — \(checked)")
                         .font(.system(size: 11))
                         .foregroundStyle(.orange)
                 }

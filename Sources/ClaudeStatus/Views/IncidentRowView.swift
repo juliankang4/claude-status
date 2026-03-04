@@ -52,10 +52,11 @@ struct IncidentRowView: View {
             if isExpanded {
                 VStack(alignment: .leading, spacing: 6) {
                     // Show resolved duration if applicable
-                    if incident.resolvedAt != nil,
+                    if let resolvedAt = incident.resolvedAt,
+                       let resolvedDate = DateFormatting.parseISO(resolvedAt),
                        let dur = DateFormatting.duration(
                            from: incident.startedAt,
-                           to: DateFormatting.parseISO(incident.resolvedAt!),
+                           to: resolvedDate,
                            language: language
                        ) {
                         Text(L10n.get(.duration, language: language) + ": " + dur)
@@ -79,7 +80,8 @@ struct IncidentRowView: View {
 
                     // Browser link
                     Button {
-                        if let url = URL(string: incident.shortlink) {
+                        if let url = URL(string: incident.shortlink),
+                           url.scheme?.lowercased() == "https" {
                             NSWorkspace.shared.open(url)
                         }
                     } label: {

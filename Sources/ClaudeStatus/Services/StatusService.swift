@@ -57,7 +57,8 @@ actor StatusService {
         components: [Component],
         incidents: [Incident]
     ) -> [String: [DayStatus]] {
-        let calendar = Calendar.current
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         let today = calendar.startOfDay(for: Date())
         var cache: [String: [DayStatus]] = [:]
 

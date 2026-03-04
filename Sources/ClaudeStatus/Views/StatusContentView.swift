@@ -48,6 +48,7 @@ struct StatusContentView: View {
             // Footer
             FooterView(
                 isOnline: monitor.isOnline,
+                lastRefresh: monitor.lastRefresh,
                 language: settings.language,
                 onRefresh: { Task { await monitor.refresh() } }
             )
