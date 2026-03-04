@@ -15,7 +15,7 @@ struct IncidentRowView: View {
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(StatusMapping.incidentColor(for: incident.status))
 
-                Text(incident.name)
+                Text(L10n.translateIncidentName(incident.name, language: language))
                     .font(.system(size: 11))
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)

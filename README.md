@@ -19,35 +19,30 @@ A native macOS menu bar app that monitors Claude service status in real time.
 
 ## Installation
 
-### Build (No Xcode required)
+### Homebrew (Recommended)
+
+```bash
+brew tap juliankang4/tap
+brew install claude-status
+```
+
+### Download
+
+Download the latest `.app.zip` from [Releases](https://github.com/juliankang4/claude-status/releases), unzip, and move to `/Applications/`.
+
+### Build from source (No Xcode required)
 
 ```bash
 git clone https://github.com/juliankang4/claude-status.git
 cd claude-status
-./Scripts/build.sh
-```
-
-Output: `Build/Claude Status.app`
-
-### Install to /Applications
-
-```bash
 ./Scripts/build.sh --install
 ```
-
-### Run
-
-```bash
-./Scripts/run.sh
-```
-
-Or double-click `Build/Claude Status.app`.
 
 ## Requirements
 
 - macOS 14 (Sonoma) or later
-- Swift 6+ (Command Line Tools)
-- No external dependencies
+- Apple Silicon (arm64)
+- For building from source: Swift 6+ (Command Line Tools)
 
 ## Data Source
 
@@ -59,9 +54,7 @@ MIT License — See [LICENSE](LICENSE)
 
 ## Changelog
 
-### v0.0.0 (2026-03-05)
-- Initial release
-- Native Swift/SwiftUI rewrite of SwiftBar shell script
+See [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
@@ -85,15 +78,19 @@ macOS 메뉴바에서 Claude 서비스 상태를 실시간으로 확인하는 �
 ### 설치
 
 ```bash
+# Homebrew (추천)
+brew tap juliankang4/tap
+brew install claude-status
+
+# 또는 소스에서 빌드
 git clone https://github.com/juliankang4/claude-status.git
 cd claude-status
-./Scripts/build.sh          # 빌드
-./Scripts/build.sh --install # /Applications에 설치
-./Scripts/run.sh             # 빌드 + 실행
+./Scripts/build.sh --install
 ```
+
+또는 [Releases](https://github.com/juliankang4/claude-status/releases)에서 `.app.zip` 다운로드.
 
 ### 요구사항
 
 - macOS 14 (Sonoma) 이상
-- Swift 6+ (Command Line Tools)
-- 외부 의존성 없음
+- Apple Silicon (arm64)

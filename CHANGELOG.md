@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1] - 2026-03-05
+
+### Added
+- Homebrew Cask install: `brew tap juliankang4/tap && brew install claude-status`
+- GitHub Releases with pre-built `.app.zip`
+- Incident name translation (Korean): "Outage in Usage Reporting" → "사용량 보고 장애"
+- Status emoji next to Claude logo in menu bar (✅/⚠️/❌/❓)
+
+### Changed
+- Menu bar icon: SVG loaded directly (fixes white square / transparency issue)
+- README rewritten in English with Korean section at bottom
+- All commit messages in English
+
+### Removed
+- CLAUDE.md and DEVLOG.md from repository (moved to .gitignore)
+
 ## [0.0.0] - 2026-03-05
 
 ### Added

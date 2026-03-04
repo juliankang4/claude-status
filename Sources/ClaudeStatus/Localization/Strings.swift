@@ -96,6 +96,58 @@ enum L10n {
         }
     }
 
+    /// Translate incident name to Korean when language is set to ko
+    static func translateIncidentName(_ name: String, language: AppLanguage) -> String {
+        guard language == .korean else { return name }
+
+        // Known word translations (applied to the whole string at the end)
+        let wordMap: [(String, String)] = [
+            ("Usage Reporting", "사용량 보고"),
+            ("usage reporting", "사용량 보고"),
+            ("login issues", "로그인 문제"),
+            ("Login issues", "로그인 문제"),
+            ("elevated error rate", "오류율 증가"),
+            ("Elevated error rate", "오류율 증가"),
+            ("and ", ""),
+        ]
+
+        // "Prefix <target>" patterns → "<target> 한국어설명"
+        let prefixPatterns: [(String, String)] = [
+            ("Elevated errors on ", " 오류 증가"),
+            ("Elevated errors in ", " 오류 증가"),
+            ("Elevated error rates on ", " 오류율 증가"),
+            ("Elevated error rates in ", " 오류율 증가"),
+            ("Outage in ", " 장애"),
+            ("Outage on ", " 장애"),
+            ("Degraded performance on ", " 성능 저하"),
+            ("Degraded performance in ", " 성능 저하"),
+            ("Increased latency on ", " 지연 증가"),
+            ("Increased latency in ", " 지연 증가"),
+            ("Service disruption on ", " 서비스 중단"),
+            ("Service disruption in ", " 서비스 중단"),
+            ("Intermittent errors on ", " 간헐적 오류"),
+            ("Intermittent errors in ", " 간헐적 오류"),
+        ]
+
+        for (prefix, suffix) in prefixPatterns {
+            if let range = name.range(of: prefix, options: .caseInsensitive) {
+                let target = translateWords(String(name[range.upperBound...]), wordMap: wordMap)
+                return target + suffix
+            }
+        }
+
+        // No prefix matched — try word-level translation
+        return translateWords(name, wordMap: wordMap)
+    }
+
+    private static func translateWords(_ text: String, wordMap: [(String, String)]) -> String {
+        var result = text
+        for (en, ko) in wordMap {
+            result = result.replacingOccurrences(of: en, with: ko)
+        }
+        return result
+    }
+
     static func incidentLabel(_ status: IncidentStatus, language: AppLanguage) -> String {
         switch language {
         case .korean:
