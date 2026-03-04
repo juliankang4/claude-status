@@ -16,7 +16,8 @@ struct ClaudeStatusApp: App {
 
                     await notificationService.requestPermission()
 
-                    monitor.onStatusChange = { changes in
+                    monitor.language = settings.language
+                    monitor.onStatusChange = { @MainActor changes in
                         guard settings.notificationsEnabled else { return }
                         let title = L10n.get(.notificationTitle, language: settings.language)
                         Task {
@@ -25,6 +26,9 @@ struct ClaudeStatusApp: App {
                     }
 
                     monitor.start()
+                }
+                .onChange(of: settings.language) { _, newLang in
+                    monitor.language = newLang
                 }
         } label: {
             MenuBarIconView(indicator: monitor.currentIndicator, isOnline: monitor.isOnline)

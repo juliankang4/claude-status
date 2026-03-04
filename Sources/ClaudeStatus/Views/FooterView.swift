@@ -36,7 +36,7 @@ struct FooterView: View {
                 }
                 .buttonStyle(.plain)
                 .onHover { hovering in
-                    if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                    if hovering { NSCursor.pointingHand.set() } else { NSCursor.arrow.set() }
                 }
 
                 Spacer()
@@ -53,7 +53,7 @@ struct FooterView: View {
                 }
                 .buttonStyle(.plain)
                 .onHover { hovering in
-                    if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                    if hovering { NSCursor.pointingHand.set() } else { NSCursor.arrow.set() }
                 }
             }
         }

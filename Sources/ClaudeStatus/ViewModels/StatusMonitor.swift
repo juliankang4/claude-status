@@ -8,13 +8,22 @@ final class StatusMonitor {
     var incidents: IncidentsResponse?
     var isOnline = true
     var lastRefresh: Date?
+    var language: AppLanguage = .english
 
     private let service = StatusService()
     private var timer: Timer?
     private var activityToken: NSObjectProtocol?
     private var previousStatuses: [String: ComponentStatus] = [:]
+    private var uptimeCache: [String: [DayStatus]] = [:]
 
-    var onStatusChange: ((_ changes: String) -> Void)?
+    private let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        f.timeZone = TimeZone(identifier: "UTC")
+        return f
+    }()
+
+    var onStatusChange: (@MainActor (_ changes: String) -> Void)?
 
     var currentIndicator: StatusIndicator {
         summary?.status.indicator ?? .unknown
@@ -34,20 +43,17 @@ final class StatusMonitor {
     }
 
     func start() {
-        // Prevent App Nap
+        // Prevent App Nap only (not system sleep)
         activityToken = ProcessInfo.processInfo.beginActivity(
-            options: [.userInitiated, .idleSystemSleepDisabled],
+            options: .userInitiated,
             reason: "Status monitoring requires periodic updates"
         )
 
-        // Initial fetch
         Task { await refresh() }
 
-        // 15-second timer
-        timer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            Task { @MainActor in
-                await self.refresh()
+        timer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { _ in
+            Task { @MainActor [weak self] in
+                await self?.refresh()
             }
         }
     }
@@ -67,54 +73,59 @@ final class StatusMonitor {
         summary = result.summary
         incidents = result.incidents
         isOnline = result.isOnline
-
         lastRefresh = Date()
 
-        // Change detection
+        // Rebuild uptime cache
+        rebuildUptimeCache()
+
         if isOnline, let components = summary?.components {
             detectChanges(components)
         }
     }
 
-    // MARK: - 30-day uptime data
+    // MARK: - 30-day uptime data (cached)
 
-    /// Returns an array of DayStatus for the last 30 days for a given component
     func uptimeData(for component: Component) -> [DayStatus] {
+        uptimeCache[component.id] ?? []
+    }
+
+    private func rebuildUptimeCache() {
+        guard let comps = summary?.components else { return }
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let allIncidents = incidents?.incidents ?? []
-        let startDate = component.startDate.flatMap { dateFromString($0) }
 
-        return (0..<30).reversed().map { daysAgo in
-            let day = calendar.date(byAdding: .day, value: -daysAgo, to: today)!
-            let dayStr = dayString(day)
+        for component in comps {
+            let startDate = component.startDate.flatMap { dateFormatter.date(from: $0) }
 
-            // Before component start date
-            if let start = startDate, day < start {
-                return DayStatus(date: day, status: .noData)
-            }
+            let data: [DayStatus] = (0..<30).reversed().map { daysAgo in
+                let day = calendar.date(byAdding: .day, value: -daysAgo, to: today)!
+                let dayStr = dateFormatter.string(from: day)
 
-            // Check incidents affecting this component on this day
-            let impacts = allIncidents.compactMap { incident -> IncidentImpact? in
-                let incStart = incident.startedAt.prefix(10)
-                let incEnd = (incident.resolvedAt ?? "9999-12-31").prefix(10)
-
-                guard dayStr >= incStart && dayStr <= incEnd else { return nil }
-
-                // Check if this component was affected
-                let affected = incident.incidentUpdates.contains { update in
-                    update.affectedComponents?.contains { $0.code == component.id } ?? false
+                if let start = startDate, day < start {
+                    return DayStatus(date: day, status: .noData)
                 }
-                return affected ? incident.impact : nil
-            }
 
-            if impacts.isEmpty {
-                return DayStatus(date: day, status: .operational)
-            } else if impacts.contains(where: { $0 == .major || $0 == .critical }) {
-                return DayStatus(date: day, status: .major)
-            } else {
-                return DayStatus(date: day, status: .minor)
+                let impacts = allIncidents.compactMap { incident -> IncidentImpact? in
+                    let incStart = incident.startedAt.prefix(10)
+                    let incEnd = (incident.resolvedAt ?? "9999-12-31").prefix(10)
+                    guard dayStr >= incStart && dayStr <= incEnd else { return nil }
+
+                    let affected = incident.incidentUpdates.contains { update in
+                        update.affectedComponents?.contains { $0.code == component.id } ?? false
+                    }
+                    return affected ? incident.impact : nil
+                }
+
+                if impacts.isEmpty {
+                    return DayStatus(date: day, status: .operational)
+                } else if impacts.contains(where: { $0 == .major || $0 == .critical }) {
+                    return DayStatus(date: day, status: .major)
+                } else {
+                    return DayStatus(date: day, status: .minor)
+                }
             }
+            uptimeCache[component.id] = data
         }
     }
 
@@ -126,7 +137,7 @@ final class StatusMonitor {
         for comp in components {
             if let prev = previousStatuses[comp.id], prev != comp.status {
                 let name = comp.displayName
-                let label = L10n.statusLabel(comp.status, language: .english)
+                let label = L10n.statusLabel(comp.status, language: language)
                 changes.append("\(name) → \(label)")
             }
             previousStatuses[comp.id] = comp.status
@@ -135,20 +146,6 @@ final class StatusMonitor {
         if !changes.isEmpty {
             onStatusChange?(changes.joined(separator: ", "))
         }
-    }
-
-    private func dateFromString(_ s: String) -> Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "UTC")
-        return formatter.date(from: s)
-    }
-
-    private func dayString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "UTC")
-        return formatter.string(from: date)
     }
 }
 

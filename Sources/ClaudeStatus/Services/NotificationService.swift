@@ -14,14 +14,10 @@ actor NotificationService {
     }
 
     func send(title: String, body: String) async {
-        guard authorized else {
-            // Check if permission was granted after initial request
-            let center = UNUserNotificationCenter.current()
-            let settings = await center.notificationSettings()
+        if !authorized {
+            let settings = await UNUserNotificationCenter.current().notificationSettings()
             guard settings.authorizationStatus == .authorized else { return }
             authorized = true
-            await send(title: title, body: body)
-            return
         }
 
         let content = UNMutableNotificationContent()

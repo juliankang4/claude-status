@@ -1,25 +1,18 @@
 import Foundation
 
 enum DateFormatting {
-    private nonisolated(unsafe) static let isoFormatter: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return f
-    }()
-
-    private nonisolated(unsafe) static let isoBasic: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withInternetDateTime]
-        return f
-    }()
-
     static func parseISO(_ string: String) -> Date? {
-        isoFormatter.date(from: string) ?? isoBasic.date(from: string)
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractional.date(from: string) { return date }
+
+        let basic = ISO8601DateFormatter()
+        basic.formatOptions = [.withInternetDateTime]
+        return basic.date(from: string)
     }
 
     static func shortDate(_ string: String) -> String {
         guard let date = parseISO(string) else {
-            // Fallback: extract M/d from ISO string
             let parts = string.prefix(10).split(separator: "-")
             guard parts.count >= 3 else { return string }
             let month = Int(parts[1]) ?? 0

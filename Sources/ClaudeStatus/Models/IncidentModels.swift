@@ -30,10 +30,6 @@ struct Incident: Codable, Sendable, Identifiable {
         case incidentUpdates = "incident_updates"
     }
 
-    var createdDate: Date? {
-        ISO8601DateFormatter().date(from: createdAt)
-            ?? ISO8601DateFormatter.fractional.date(from: createdAt)
-    }
 }
 
 struct IncidentUpdate: Codable, Sendable {
@@ -88,12 +84,4 @@ enum IncidentImpact: String, Codable, Sendable {
         let value = try decoder.singleValueContainer().decode(String.self)
         self = IncidentImpact(rawValue: value) ?? .unknown
     }
-}
-
-extension ISO8601DateFormatter {
-    nonisolated(unsafe) static let fractional: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return f
-    }()
 }

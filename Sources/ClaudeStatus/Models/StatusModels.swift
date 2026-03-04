@@ -5,11 +5,10 @@ import Foundation
 struct SummaryResponse: Codable, Sendable {
     let page: PageInfo
     let components: [Component]
-    let incidents: [SummaryIncident]
     let status: OverallStatus
 
     enum CodingKeys: String, CodingKey {
-        case page, components, incidents, status
+        case page, components, status
     }
 }
 
@@ -65,13 +64,6 @@ enum ComponentStatus: String, Codable, Sendable {
         let value = try decoder.singleValueContainer().decode(String.self)
         self = ComponentStatus(rawValue: value) ?? .unknown
     }
-}
-
-struct SummaryIncident: Codable, Sendable {
-    // Minimal — summary only includes active incidents
-    let id: String
-    let name: String
-    let status: String
 }
 
 struct OverallStatus: Codable, Sendable {
