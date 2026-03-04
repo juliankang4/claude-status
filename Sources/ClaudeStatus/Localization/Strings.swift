@@ -27,6 +27,7 @@ enum L10n {
         case launchAtLogin
         case launchAtLoginOn
         case launchAtLoginOff
+        case quit
 
         var en: String {
             switch self {
@@ -48,6 +49,7 @@ enum L10n {
             case .launchAtLogin: "Launch at Login"
             case .launchAtLoginOn: "Launch at Login: On"
             case .launchAtLoginOff: "Launch at Login: Off"
+            case .quit: "Quit Claude Status"
             }
         }
 
@@ -71,6 +73,7 @@ enum L10n {
             case .launchAtLogin: "시작프로그램"
             case .launchAtLoginOn: "시작프로그램: 켜짐"
             case .launchAtLoginOff: "시작프로그램: 꺼짐"
+            case .quit: "종료"
             }
         }
     }
@@ -108,7 +111,6 @@ enum L10n {
             ("Login issues", "로그인 문제"),
             ("elevated error rate", "오류율 증가"),
             ("Elevated error rate", "오류율 증가"),
-            ("and ", ""),
         ]
 
         // "Prefix <target>" patterns → "<target> 한국어설명"

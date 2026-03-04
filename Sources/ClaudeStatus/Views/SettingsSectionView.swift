@@ -63,7 +63,7 @@ struct SettingsSectionView: View {
             Button {
                 NSApplication.shared.terminate(nil)
             } label: {
-                Text(settings.language == .korean ? "종료" : "Quit Claude Status")
+                Text(L10n.get(.quit, language: settings.language))
                     .font(.system(size: 11))
                     .frame(maxWidth: .infinity, alignment: .center)
             }

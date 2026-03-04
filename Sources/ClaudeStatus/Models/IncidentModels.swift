@@ -29,7 +29,6 @@ struct Incident: Codable, Sendable, Identifiable {
         case startedAt = "started_at"
         case incidentUpdates = "incident_updates"
     }
-
 }
 
 struct IncidentUpdate: Codable, Sendable {

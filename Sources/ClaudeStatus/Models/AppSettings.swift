@@ -14,16 +14,11 @@ final class AppSettings {
 
     init() {
         let defaults = UserDefaults.standard
-
-        if defaults.object(forKey: "notificationsEnabled") == nil {
-            defaults.set(true, forKey: "notificationsEnabled")
-        }
-        if defaults.string(forKey: "language") == nil {
-            // Default to system language
-            let preferred = Locale.preferredLanguages.first ?? "en"
-            let lang = preferred.hasPrefix("ko") ? "ko" : "en"
-            defaults.set(lang, forKey: "language")
-        }
+        let systemLang = Locale.preferredLanguages.first?.hasPrefix("ko") == true ? "ko" : "en"
+        defaults.register(defaults: [
+            "notificationsEnabled": true,
+            "language": systemLang
+        ])
 
         self.notificationsEnabled = defaults.bool(forKey: "notificationsEnabled")
         self.language = AppLanguage(rawValue: defaults.string(forKey: "language") ?? "en") ?? .english

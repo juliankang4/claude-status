@@ -42,7 +42,7 @@ actor StatusService {
         return FetchResult(
             summary: summaryResult.value,
             incidents: incidentsResult.value,
-            isOnline: summaryResult.online
+            isOnline: summaryResult.online && incidentsResult.online
         )
     }
 
@@ -68,7 +68,7 @@ actor StatusService {
             }
 
             let decoded = try JSONDecoder().decode(type, from: data)
-            try? data.write(to: cacheFile)
+            try? data.write(to: cacheFile, options: .atomic)
             return DecodeResult(value: decoded, online: true)
         } catch {
             let cached = loadCache(file: cacheFile, as: type)

@@ -1,14 +1,36 @@
 import Foundation
 
+@MainActor
 enum DateFormatting {
-    static func parseISO(_ string: String) -> Date? {
-        let fractional = ISO8601DateFormatter()
-        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = fractional.date(from: string) { return date }
+    private static let fractionalFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return f
+    }()
 
-        let basic = ISO8601DateFormatter()
-        basic.formatOptions = [.withInternetDateTime]
-        return basic.date(from: string)
+    private static let basicFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withInternetDateTime]
+        return f
+    }()
+
+    private static let timeFormatterEN: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US")
+        f.dateFormat = "h:mm a"
+        return f
+    }()
+
+    private static let timeFormatterKO: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "ko_KR")
+        f.dateFormat = "a h:mm"
+        return f
+    }()
+
+    static func parseISO(_ string: String) -> Date? {
+        if let date = fractionalFormatter.date(from: string) { return date }
+        return basicFormatter.date(from: string)
     }
 
     static func shortDate(_ string: String) -> String {
@@ -26,14 +48,7 @@ enum DateFormatting {
     }
 
     static func currentTime(language: AppLanguage) -> String {
-        let formatter = DateFormatter()
-        if language == .korean {
-            formatter.locale = Locale(identifier: "ko_KR")
-            formatter.dateFormat = "a h:mm"
-        } else {
-            formatter.locale = Locale(identifier: "en_US")
-            formatter.dateFormat = "h:mm a"
-        }
+        let formatter = language == .korean ? timeFormatterKO : timeFormatterEN
         return formatter.string(from: Date())
     }
 }

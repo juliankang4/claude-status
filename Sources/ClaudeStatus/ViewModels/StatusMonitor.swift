@@ -15,6 +15,8 @@ final class StatusMonitor {
     private var activityToken: NSObjectProtocol?
     private var previousStatuses: [String: ComponentStatus] = [:]
     private var uptimeCache: [String: [DayStatus]] = [:]
+    private var lastComponentIDs: [String] = []
+    private var lastIncidentIDs: [String] = []
 
     private let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -29,11 +31,6 @@ final class StatusMonitor {
         summary?.status.indicator ?? .unknown
     }
 
-    var menuBarIcon: String {
-        guard let summary else { return "☁️❓" }
-        return StatusMapping.menuBarIcon(for: summary.status.indicator, online: isOnline)
-    }
-
     var components: [Component] {
         summary?.components.filter { $0.showcase && !$0.group } ?? []
     }
@@ -43,9 +40,9 @@ final class StatusMonitor {
     }
 
     func start() {
-        // Prevent App Nap only (not system sleep)
+        // Prevent App Nap (not system sleep)
         activityToken = ProcessInfo.processInfo.beginActivity(
-            options: .userInitiated,
+            options: [.idleSystemSleepDisabled, .suddenTerminationDisabled],
             reason: "Status monitoring requires periodic updates"
         )
 
@@ -91,6 +88,16 @@ final class StatusMonitor {
 
     private func rebuildUptimeCache() {
         guard let comps = summary?.components else { return }
+
+        // Skip rebuild if data hasn't changed
+        let componentIDs = comps.map { "\($0.id):\($0.status.rawValue)" }
+        let incidentIDs = (incidents?.incidents ?? []).map { "\($0.id):\($0.updatedAt)" }
+        if componentIDs == lastComponentIDs && incidentIDs == lastIncidentIDs {
+            return
+        }
+        lastComponentIDs = componentIDs
+        lastIncidentIDs = incidentIDs
+
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let allIncidents = incidents?.incidents ?? []

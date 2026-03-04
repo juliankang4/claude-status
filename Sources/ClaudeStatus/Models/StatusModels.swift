@@ -6,10 +6,6 @@ struct SummaryResponse: Codable, Sendable {
     let page: PageInfo
     let components: [Component]
     let status: OverallStatus
-
-    enum CodingKeys: String, CodingKey {
-        case page, components, status
-    }
 }
 
 struct PageInfo: Codable, Sendable {

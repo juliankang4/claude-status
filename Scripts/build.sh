@@ -26,8 +26,7 @@ cp "$PROJECT_DIR/Resources/AppIcon.icns" "$APP_DIR/Contents/Resources/"
 cp "$PROJECT_DIR/Resources/claude-logo.svg" "$APP_DIR/Contents/Resources/"
 
 echo "=== Ad-hoc signing ==="
-codesign --force --sign - "$APP_DIR/Contents/MacOS/ClaudeStatus"
-codesign --force --sign - "$APP_DIR"
+codesign --force --deep --sign - "$APP_DIR"
 
 echo "=== Done ==="
 echo "App bundle: $APP_DIR"
