@@ -51,4 +51,38 @@ enum DateFormatting {
         let formatter = language == .korean ? timeFormatterKO : timeFormatterEN
         return formatter.string(from: Date())
     }
+
+    // MARK: - Duration
+
+    static func duration(from startString: String, to endDate: Date?, language: AppLanguage) -> String? {
+        guard let start = parseISO(startString) else { return nil }
+        let end = endDate ?? Date()
+        let interval = end.timeIntervalSince(start)
+        guard interval > 0 else { return nil }
+
+        let totalMinutes = Int(interval) / 60
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+
+        let isOngoing = (endDate == nil)
+
+        switch language {
+        case .korean:
+            if hours > 0 && minutes > 0 {
+                return isOngoing ? "\(hours)시간 \(minutes)분째" : "\(hours)시간 \(minutes)분"
+            } else if hours > 0 {
+                return isOngoing ? "\(hours)시간째" : "\(hours)시간"
+            } else {
+                return isOngoing ? "\(max(1, minutes))분째" : "\(max(1, minutes))분"
+            }
+        case .english:
+            if hours > 0 && minutes > 0 {
+                return isOngoing ? "\(hours)h \(minutes)m ongoing" : "\(hours)h \(minutes)m"
+            } else if hours > 0 {
+                return isOngoing ? "\(hours)h ongoing" : "\(hours)h"
+            } else {
+                return isOngoing ? "\(max(1, minutes))m ongoing" : "\(max(1, minutes))m"
+            }
+        }
+    }
 }

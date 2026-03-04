@@ -55,7 +55,7 @@ struct StatusContentView: View {
             Divider()
 
             // Settings
-            SettingsSectionView(settings: settings)
+            SettingsSectionView(settings: settings, monitor: monitor)
         }
         .frame(width: 340)
     }

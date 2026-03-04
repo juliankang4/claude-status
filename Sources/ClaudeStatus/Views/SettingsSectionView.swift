@@ -3,8 +3,10 @@ import ServiceManagement
 
 struct SettingsSectionView: View {
     @Bindable var settings: AppSettings
+    let monitor: StatusMonitor
 
     @State private var loginItemEnabled = false
+    @State private var showServiceAlerts = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -28,6 +30,48 @@ struct SettingsSectionView: View {
             .toggleStyle(.switch)
             .controlSize(.mini)
 
+            // Service-specific alert toggles
+            if settings.notificationsEnabled && !monitor.components.isEmpty {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showServiceAlerts.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(showServiceAlerts ? "▼" : "▶")
+                            .font(.system(size: 8))
+                            .foregroundStyle(.secondary)
+                        Text("🔕")
+                        Text(L10n.get(.serviceAlerts, language: settings.language))
+                            .font(.system(size: 11))
+                    }
+                }
+                .buttonStyle(.plain)
+
+                if showServiceAlerts {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(monitor.components) { comp in
+                            Toggle(isOn: Binding(
+                                get: { !settings.mutedServices.contains(comp.id) },
+                                set: { enabled in
+                                    if enabled {
+                                        settings.mutedServices.remove(comp.id)
+                                    } else {
+                                        settings.mutedServices.insert(comp.id)
+                                    }
+                                }
+                            )) {
+                                Text(comp.displayName)
+                                    .font(.system(size: 11))
+                            }
+                            .toggleStyle(.switch)
+                            .controlSize(.mini)
+                        }
+                    }
+                    .padding(.leading, 16)
+                }
+            }
+
             // Launch at login toggle
             Toggle(isOn: $loginItemEnabled) {
                 HStack(spacing: 4) {
@@ -44,6 +88,22 @@ struct SettingsSectionView: View {
                 updateLoginItem(enabled: newValue)
             }
 
+            // Refresh interval
+            HStack(spacing: 8) {
+                Text("⏱")
+                Text(L10n.get(.refreshInterval, language: settings.language))
+                    .font(.system(size: 11))
+                Spacer()
+                Picker("", selection: $settings.refreshInterval) {
+                    ForEach(AppConstants.refreshIntervalOptions, id: \.self) { interval in
+                        Text(L10n.refreshIntervalLabel(interval, language: settings.language))
+                            .tag(interval)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 160)
+            }
+
             // Language
             HStack(spacing: 8) {
                 Text("🌐")
@@ -56,6 +116,26 @@ struct SettingsSectionView: View {
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 140)
+            }
+
+            // Update available
+            if let release = monitor.latestRelease {
+                Button {
+                    if let url = URL(string: release.url) {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text("🆕")
+                        Text("\(L10n.get(.updateAvailable, language: settings.language)): v\(release.version)")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.blue)
+                    }
+                }
+                .buttonStyle(.plain)
+                .onHover { hovering in
+                    if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                }
             }
 
             // Quit
@@ -87,7 +167,6 @@ struct SettingsSectionView: View {
                 try SMAppService.mainApp.unregister()
             }
         } catch {
-            // Revert on failure
             loginItemEnabled = SMAppService.mainApp.status == .enabled
         }
     }

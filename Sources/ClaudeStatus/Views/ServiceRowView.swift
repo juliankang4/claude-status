@@ -26,7 +26,8 @@ struct ServiceRowView: View {
             if !uptimeData.isEmpty {
                 UptimeBarView(
                     data: uptimeData,
-                    label: L10n.get(.thirtyDays, language: language)
+                    label: L10n.get(.thirtyDays, language: language),
+                    language: language
                 )
             }
         }

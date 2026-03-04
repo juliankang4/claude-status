@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.5] - 2026-03-05
+
+### Added
+- Per-service notification mute: toggle alerts for individual services in Settings
+- Incident duration display: ongoing incidents show "2h 30m ongoing", resolved show total duration
+- Uptime bar date tooltips: hover each day to see date + status (e.g., "3/4 — Operational")
+- Global hotkey (Cmd+Shift+C) to toggle the popover from anywhere
+- In-app incident detail: click to expand/collapse incident updates inline (browser link preserved)
+- Configurable refresh interval: 15s / 30s / 1m / 5m picker in Settings
+- Auto update check: checks GitHub Releases on launch, shows banner if new version available
+
+### Changed
+- Timer.scheduledTimer replaced with Task.sleep loop for clean cancellation
+- Network monitoring via NWPathMonitor — skips API calls when offline, refreshes immediately on reconnect
+- App termination now calls stop() via willTerminateNotification — prevents resource leaks
+- Error logging with os_log (Logger) in StatusService for diagnostics
+- Uptime calculation moved from StatusMonitor (main thread) to StatusService (actor) for better performance
+- All hardcoded constants (URLs, intervals, cache TTL) consolidated into AppConstants.swift
+
 ## [0.0.4] - 2026-03-05
 
 ### Fixed

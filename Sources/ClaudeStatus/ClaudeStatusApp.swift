@@ -1,4 +1,5 @@
 import SwiftUI
+import Carbon.HIToolbox
 
 @main
 struct ClaudeStatusApp: App {
@@ -17,6 +18,8 @@ struct ClaudeStatusApp: App {
                     await notificationService.requestPermission()
 
                     monitor.language = settings.language
+                    monitor.refreshInterval = settings.refreshInterval
+                    monitor.mutedServices = settings.mutedServices
                     monitor.onStatusChange = { @MainActor changes in
                         guard settings.notificationsEnabled else { return }
                         let title = L10n.get(.notificationTitle, language: settings.language)
@@ -26,13 +29,58 @@ struct ClaudeStatusApp: App {
                     }
 
                     monitor.start()
+                    registerGlobalHotkey()
+                    registerTerminationObserver()
                 }
                 .onChange(of: settings.language) { _, newLang in
                     monitor.language = newLang
+                }
+                .onChange(of: settings.refreshInterval) { _, newInterval in
+                    monitor.refreshInterval = newInterval
+                    monitor.restartRefreshLoop()
+                }
+                .onChange(of: settings.mutedServices) { _, newMuted in
+                    monitor.mutedServices = newMuted
                 }
         } label: {
             MenuBarIconView(indicator: monitor.currentIndicator, isOnline: monitor.isOnline)
         }
         .menuBarExtraStyle(.window)
+    }
+
+    // MARK: - Termination
+
+    private func registerTerminationObserver() {
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { [monitor] _ in
+            Task { @MainActor in
+                monitor.stop()
+            }
+        }
+    }
+
+    // MARK: - Global Hotkey (Cmd+Shift+C)
+
+    private func registerGlobalHotkey() {
+        NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
+            let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            if event.keyCode == AppConstants.hotkeyKeyCode
+                && flags == [.command, .shift] {
+                Task { @MainActor in
+                    togglePopover()
+                }
+            }
+        }
+    }
+
+    @MainActor
+    private func togglePopover() {
+        guard let button = NSApp.windows
+            .compactMap({ $0.value(forKey: "_statusItem") as? NSStatusItem })
+            .first?.button else { return }
+        button.performClick(nil)
     }
 }

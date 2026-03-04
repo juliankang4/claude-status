@@ -3,40 +3,118 @@ import SwiftUI
 struct IncidentRowView: View {
     let incident: Incident
     let language: AppLanguage
+    @Binding var isExpanded: Bool
 
     var body: some View {
-        Button {
-            if let url = URL(string: incident.shortlink) {
-                NSWorkspace.shared.open(url)
+        VStack(alignment: .leading, spacing: 4) {
+            // Header row (clickable to expand/collapse)
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack(alignment: .top, spacing: 6) {
+                    Text(isExpanded ? "▼" : "▶")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 10, alignment: .center)
+                        .padding(.top, 2)
+
+                    Text("[\(L10n.incidentLabel(incident.status, language: language))]")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(StatusMapping.incidentColor(for: incident.status))
+
+                    Text(L10n.translateIncidentName(incident.name, language: language))
+                        .font(.system(size: 11))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .foregroundStyle(.primary)
+
+                    Spacer()
+
+                    // Duration for ongoing, date for resolved
+                    if incident.resolvedAt == nil,
+                       let dur = DateFormatting.duration(from: incident.startedAt, to: nil, language: language) {
+                        Text(dur)
+                            .font(.system(size: 10))
+                            .foregroundStyle(.orange)
+                    } else {
+                        Text(DateFormatting.shortDate(incident.createdAt))
+                            .font(.system(size: 10))
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
-        } label: {
-            HStack(alignment: .top, spacing: 6) {
-                Text("[\(L10n.incidentLabel(incident.status, language: language))]")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(StatusMapping.incidentColor(for: incident.status))
+            .buttonStyle(.plain)
+            .contentShape(Rectangle())
 
-                Text(L10n.translateIncidentName(incident.name, language: language))
-                    .font(.system(size: 11))
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                    .foregroundStyle(.primary)
+            // Expanded detail
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 6) {
+                    // Show resolved duration if applicable
+                    if incident.resolvedAt != nil,
+                       let dur = DateFormatting.duration(
+                           from: incident.startedAt,
+                           to: DateFormatting.parseISO(incident.resolvedAt!),
+                           language: language
+                       ) {
+                        Text(L10n.get(.duration, language: language) + ": " + dur)
+                            .font(.system(size: 10))
+                            .foregroundStyle(.secondary)
+                    }
 
-                Spacer()
+                    // Incident updates
+                    ForEach(incident.incidentUpdates.prefix(3), id: \.id) { update in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("[\(L10n.incidentLabel(update.status, language: language))]")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(StatusMapping.incidentColor(for: update.status))
 
-                Text(DateFormatting.shortDate(incident.createdAt))
-                    .font(.system(size: 10))
-                    .foregroundStyle(.secondary)
+                            Text(cleanHTML(update.body))
+                                .font(.system(size: 10))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(4)
+                        }
+                    }
+
+                    // Browser link
+                    Button {
+                        if let url = URL(string: incident.shortlink) {
+                            NSWorkspace.shared.open(url)
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text("🔗")
+                                .font(.system(size: 10))
+                            Text(L10n.get(.openInBrowser, language: language))
+                                .font(.system(size: 10))
+                                .foregroundStyle(.blue)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .onHover { hovering in
+                        if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                    }
+                }
+                .padding(.leading, 16)
+                .padding(.top, 2)
             }
         }
-        .buttonStyle(.plain)
         .padding(.vertical, 2)
-        .contentShape(Rectangle())
-        .onHover { hovering in
-            if hovering {
-                NSCursor.pointingHand.push()
-            } else {
-                NSCursor.pop()
-            }
+    }
+
+    private func cleanHTML(_ html: String) -> String {
+        var text = html
+        // Remove HTML tags
+        while let range = text.range(of: "<[^>]+>", options: .regularExpression) {
+            text.replaceSubrange(range, with: "")
         }
+        // Decode common entities
+        text = text.replacingOccurrences(of: "&amp;", with: "&")
+        text = text.replacingOccurrences(of: "&lt;", with: "<")
+        text = text.replacingOccurrences(of: "&gt;", with: ">")
+        text = text.replacingOccurrences(of: "&#39;", with: "'")
+        text = text.replacingOccurrences(of: "&quot;", with: "\"")
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

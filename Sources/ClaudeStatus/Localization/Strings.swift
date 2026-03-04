@@ -28,6 +28,13 @@ enum L10n {
         case launchAtLoginOn
         case launchAtLoginOff
         case quit
+        // v0.0.5
+        case duration
+        case openInBrowser
+        case refreshInterval
+        case serviceAlerts
+        case updateAvailable
+        case networkOffline
 
         var en: String {
             switch self {
@@ -50,6 +57,13 @@ enum L10n {
             case .launchAtLoginOn: "Launch at Login: On"
             case .launchAtLoginOff: "Launch at Login: Off"
             case .quit: "Quit Claude Status"
+            // v0.0.5
+            case .duration: "Duration"
+            case .openInBrowser: "Open in browser"
+            case .refreshInterval: "Refresh interval"
+            case .serviceAlerts: "Service alerts"
+            case .updateAvailable: "Update available"
+            case .networkOffline: "Network offline"
             }
         }
 
@@ -74,6 +88,13 @@ enum L10n {
             case .launchAtLoginOn: "시작프로그램: 켜짐"
             case .launchAtLoginOff: "시작프로그램: 꺼짐"
             case .quit: "종료"
+            // v0.0.5
+            case .duration: "지속 시간"
+            case .openInBrowser: "브라우저에서 열기"
+            case .refreshInterval: "갱신 주기"
+            case .serviceAlerts: "서비스별 알림"
+            case .updateAvailable: "업데이트 가능"
+            case .networkOffline: "네트워크 연결 없음"
             }
         }
     }
@@ -168,6 +189,18 @@ enum L10n {
             case .investigating: "Investigating"
             case .unknown: "Unknown"
             }
+        }
+    }
+
+    static func refreshIntervalLabel(_ interval: TimeInterval, language: AppLanguage) -> String {
+        let seconds = Int(interval)
+        switch language {
+        case .korean:
+            if seconds < 60 { return "\(seconds)초" }
+            return "\(seconds / 60)분"
+        case .english:
+            if seconds < 60 { return "\(seconds)s" }
+            return "\(seconds / 60)m"
         }
     }
 }

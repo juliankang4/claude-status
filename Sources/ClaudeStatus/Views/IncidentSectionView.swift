@@ -4,6 +4,8 @@ struct IncidentSectionView: View {
     let incidents: [Incident]
     let language: AppLanguage
 
+    @State private var expandedIDs: Set<String> = []
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
@@ -19,7 +21,20 @@ struct IncidentSectionView: View {
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(incidents) { incident in
-                    IncidentRowView(incident: incident, language: language)
+                    IncidentRowView(
+                        incident: incident,
+                        language: language,
+                        isExpanded: Binding(
+                            get: { expandedIDs.contains(incident.id) },
+                            set: { newValue in
+                                if newValue {
+                                    expandedIDs.insert(incident.id)
+                                } else {
+                                    expandedIDs.remove(incident.id)
+                                }
+                            }
+                        )
+                    )
                 }
             }
         }

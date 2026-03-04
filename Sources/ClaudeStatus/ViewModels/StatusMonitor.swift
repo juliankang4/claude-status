@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Network
 
 @Observable
 @MainActor
@@ -9,23 +10,25 @@ final class StatusMonitor {
     var isOnline = true
     var lastRefresh: Date?
     var language: AppLanguage = .english
+    var latestRelease: StatusService.LatestRelease?
+    var isNetworkAvailable = true
 
     private let service = StatusService()
-    private var timer: Timer?
+    private var refreshTask: Task<Void, Never>?
     private var activityToken: NSObjectProtocol?
     private var previousStatuses: [String: ComponentStatus] = [:]
     private var uptimeCache: [String: [DayStatus]] = [:]
     private var lastComponentIDs: [String] = []
     private var lastIncidentIDs: [String] = []
 
-    private let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        f.timeZone = TimeZone(identifier: "UTC")
-        return f
-    }()
+    private var pathMonitor: NWPathMonitor?
+    private var pathMonitorQueue = DispatchQueue(label: "com.julianyoon.claude-status.network")
 
     var onStatusChange: (@MainActor (_ changes: String) -> Void)?
+
+    // Settings references (set by ClaudeStatusApp)
+    var refreshInterval: TimeInterval = AppConstants.defaultRefreshInterval
+    var mutedServices: Set<String> = []
 
     var currentIndicator: StatusIndicator {
         summary?.status.indicator ?? .unknown
@@ -36,35 +39,47 @@ final class StatusMonitor {
     }
 
     var recentIncidents: [Incident] {
-        Array((incidents?.incidents ?? []).prefix(5))
+        Array((incidents?.incidents ?? []).prefix(AppConstants.maxRecentIncidents))
     }
 
     func start() {
-        // Prevent App Nap (not system sleep)
+        // Prevent App Nap
         activityToken = ProcessInfo.processInfo.beginActivity(
             options: .userInitiatedAllowingIdleSystemSleep,
             reason: "Status monitoring requires periodic updates"
         )
 
-        Task { await refresh() }
+        // Network monitor
+        startNetworkMonitor()
 
-        timer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { _ in
-            Task { @MainActor [weak self] in
-                await self?.refresh()
-            }
+        // Check for updates (once)
+        Task {
+            latestRelease = await service.checkForUpdate()
         }
+
+        // Start refresh loop
+        startRefreshLoop()
     }
 
     func stop() {
-        timer?.invalidate()
-        timer = nil
+        refreshTask?.cancel()
+        refreshTask = nil
+        pathMonitor?.cancel()
+        pathMonitor = nil
         if let token = activityToken {
             ProcessInfo.processInfo.endActivity(token)
             activityToken = nil
         }
     }
 
+    func restartRefreshLoop() {
+        refreshTask?.cancel()
+        startRefreshLoop()
+    }
+
     func refresh() async {
+        guard isNetworkAvailable else { return }
+
         let result = await service.fetch()
 
         summary = result.summary
@@ -72,21 +87,53 @@ final class StatusMonitor {
         isOnline = result.isOnline
         lastRefresh = Date()
 
-        // Rebuild uptime cache
-        rebuildUptimeCache()
+        // Rebuild uptime cache off main thread
+        await rebuildUptimeCache()
 
         if isOnline, let components = summary?.components {
             detectChanges(components)
         }
     }
 
-    // MARK: - 30-day uptime data (cached)
+    // MARK: - 30-day uptime data
 
     func uptimeData(for component: Component) -> [DayStatus] {
         uptimeCache[component.id] ?? []
     }
 
-    private func rebuildUptimeCache() {
+    // MARK: - Private
+
+    private func startNetworkMonitor() {
+        pathMonitor = NWPathMonitor()
+        pathMonitor?.pathUpdateHandler = { [weak self] path in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                let wasAvailable = self.isNetworkAvailable
+                self.isNetworkAvailable = (path.status == .satisfied)
+
+                // Network restored → immediate refresh
+                if !wasAvailable && self.isNetworkAvailable {
+                    await self.refresh()
+                }
+            }
+        }
+        pathMonitor?.start(queue: pathMonitorQueue)
+    }
+
+    private func startRefreshLoop() {
+        refreshTask = Task { [weak self] in
+            guard let self else { return }
+            await self.refresh()
+
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(self.refreshInterval))
+                guard !Task.isCancelled else { break }
+                await self.refresh()
+            }
+        }
+    }
+
+    private func rebuildUptimeCache() async {
         guard let comps = summary?.components else { return }
 
         // Skip rebuild if data hasn't changed
@@ -98,51 +145,19 @@ final class StatusMonitor {
         lastComponentIDs = componentIDs
         lastIncidentIDs = incidentIDs
 
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
         let allIncidents = incidents?.incidents ?? []
-
-        for component in comps {
-            let startDate = component.startDate.flatMap { dateFormatter.date(from: $0) }
-
-            let data: [DayStatus] = (0..<30).reversed().map { daysAgo in
-                let day = calendar.date(byAdding: .day, value: -daysAgo, to: today)!
-                let dayStr = dateFormatter.string(from: day)
-
-                if let start = startDate, day < start {
-                    return DayStatus(date: day, status: .noData)
-                }
-
-                let impacts = allIncidents.compactMap { incident -> IncidentImpact? in
-                    let incStart = incident.startedAt.prefix(10)
-                    let incEnd = (incident.resolvedAt ?? "9999-12-31").prefix(10)
-                    guard dayStr >= incStart && dayStr <= incEnd else { return nil }
-
-                    let affected = incident.incidentUpdates.contains { update in
-                        update.affectedComponents?.contains { $0.code == component.id } ?? false
-                    }
-                    return affected ? incident.impact : nil
-                }
-
-                if impacts.isEmpty {
-                    return DayStatus(date: day, status: .operational)
-                } else if impacts.contains(where: { $0 == .major || $0 == .critical }) {
-                    return DayStatus(date: day, status: .major)
-                } else {
-                    return DayStatus(date: day, status: .minor)
-                }
-            }
-            uptimeCache[component.id] = data
-        }
+        let cache = await service.buildUptimeCache(components: comps, incidents: allIncidents)
+        uptimeCache = cache
     }
-
-    // MARK: - Private
 
     private func detectChanges(_ components: [Component]) {
         var changes: [String] = []
 
         for comp in components {
             if let prev = previousStatuses[comp.id], prev != comp.status {
+                // Skip muted services
+                guard !mutedServices.contains(comp.id) else { continue }
+
                 let name = comp.displayName
                 let label = L10n.statusLabel(comp.status, language: language)
                 changes.append("\(name) → \(label)")
