@@ -16,6 +16,10 @@ final class StatusMonitor {
 
     var onStatusChange: ((_ changes: String) -> Void)?
 
+    var currentIndicator: StatusIndicator {
+        summary?.status.indicator ?? .unknown
+    }
+
     var menuBarIcon: String {
         guard let summary else { return "☁️❓" }
         return StatusMapping.menuBarIcon(for: summary.status.indicator, online: isOnline)

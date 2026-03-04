@@ -27,7 +27,7 @@ struct ClaudeStatusApp: App {
                     monitor.start()
                 }
         } label: {
-            Text(monitor.menuBarIcon)
+            MenuBarIconView(indicator: monitor.currentIndicator, isOnline: monitor.isOnline)
         }
         .menuBarExtraStyle(.window)
     }

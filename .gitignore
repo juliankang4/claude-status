@@ -5,3 +5,5 @@ Build/
 *.xcworkspace
 DerivedData/
 .DS_Store
+CLAUDE.md
+DEVLOG.md
