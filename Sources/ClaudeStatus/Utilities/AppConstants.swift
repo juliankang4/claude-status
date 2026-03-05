@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 
 enum AppConstants {
     // MARK: - API
@@ -27,4 +28,18 @@ enum AppConstants {
 
     // MARK: - Keyboard Shortcut
     static let hotkeyKeyCode: UInt16 = 8 // 'C' key
+
+    // MARK: - Allowed External Hosts
+    static let allowedHosts: Set<String> = [
+        "status.claude.com", "stspg.io", "github.com", "www.github.com"
+    ]
+
+    static func openIfAllowed(_ raw: String) {
+        guard let url = URL(string: raw),
+              url.scheme?.lowercased() == "https",
+              let host = url.host?.lowercased(),
+              allowedHosts.contains(where: { host == $0 || host.hasSuffix(".\($0)") })
+        else { return }
+        NSWorkspace.shared.open(url)
+    }
 }

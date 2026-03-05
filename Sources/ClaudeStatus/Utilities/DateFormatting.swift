@@ -47,11 +47,6 @@ enum DateFormatting {
         return "\(month)/\(day)"
     }
 
-    static func currentTime(language: AppLanguage) -> String {
-        let formatter = language == .korean ? timeFormatterKO : timeFormatterEN
-        return formatter.string(from: Date())
-    }
-
     static func time(_ date: Date, language: AppLanguage) -> String {
         let formatter = language == .korean ? timeFormatterKO : timeFormatterEN
         return formatter.string(from: date)

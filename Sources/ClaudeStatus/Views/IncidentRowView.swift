@@ -80,10 +80,7 @@ struct IncidentRowView: View {
 
                     // Browser link
                     Button {
-                        if let url = URL(string: incident.shortlink),
-                           url.scheme?.lowercased() == "https" {
-                            NSWorkspace.shared.open(url)
-                        }
+                        AppConstants.openIfAllowed(incident.shortlink)
                     } label: {
                         HStack(spacing: 4) {
                             Text("🔗")
@@ -106,12 +103,14 @@ struct IncidentRowView: View {
     }
 
     private func cleanHTML(_ html: String) -> String {
-        var text = html.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+        // Remove complete tags and unclosed tags (e.g., "<img src=x onerror=")
+        var text = html.replacingOccurrences(of: "<[^>]*>?", with: "", options: .regularExpression)
         text = text.replacingOccurrences(of: "&amp;", with: "&")
         text = text.replacingOccurrences(of: "&lt;", with: "<")
         text = text.replacingOccurrences(of: "&gt;", with: ">")
         text = text.replacingOccurrences(of: "&#39;", with: "'")
         text = text.replacingOccurrences(of: "&quot;", with: "\"")
+        text = text.replacingOccurrences(of: "&#\\d+;", with: "", options: .regularExpression)
         return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

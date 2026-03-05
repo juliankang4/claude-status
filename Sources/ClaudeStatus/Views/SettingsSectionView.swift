@@ -121,10 +121,7 @@ struct SettingsSectionView: View {
             // Update available
             if let release = monitor.latestRelease {
                 Button {
-                    if let url = URL(string: release.url),
-                       url.scheme?.lowercased() == "https" {
-                        NSWorkspace.shared.open(url)
-                    }
+                    AppConstants.openIfAllowed(release.url)
                 } label: {
                     HStack(spacing: 4) {
                         Text("🆕")

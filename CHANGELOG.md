@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.8] - 2026-03-05
+
+### Fixed
+- Security hardening: URL domain allowlist, cache directory permissions (0700), HTML stripping improvement
+
 ## [0.0.7] - 2026-03-05
 
 ### Fixed

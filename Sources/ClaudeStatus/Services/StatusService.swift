@@ -21,7 +21,11 @@ actor StatusService {
         summaryCacheFile = cacheDir.appendingPathComponent(AppConstants.summaryCacheFileName)
         incidentsCacheFile = cacheDir.appendingPathComponent(AppConstants.incidentsCacheFileName)
 
-        try? FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(
+            at: cacheDir,
+            withIntermediateDirectories: true,
+            attributes: [.posixPermissions: 0o700]
+        )
     }
 
     struct FetchResult: Sendable {
