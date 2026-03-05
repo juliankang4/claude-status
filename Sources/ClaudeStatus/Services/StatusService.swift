@@ -21,16 +21,19 @@ actor StatusService {
         summaryCacheFile = cacheDir.appendingPathComponent(AppConstants.summaryCacheFileName)
         incidentsCacheFile = cacheDir.appendingPathComponent(AppConstants.incidentsCacheFileName)
 
-        try? FileManager.default.createDirectory(
-            at: cacheDir,
-            withIntermediateDirectories: true,
-            attributes: [.posixPermissions: 0o700]
-        )
-        // Enforce permissions on pre-existing directories
-        try? FileManager.default.setAttributes(
-            [.posixPermissions: 0o700],
-            ofItemAtPath: cacheDir.path
-        )
+        do {
+            try FileManager.default.createDirectory(
+                at: cacheDir,
+                withIntermediateDirectories: true,
+                attributes: [.posixPermissions: 0o700]
+            )
+            try FileManager.default.setAttributes(
+                [.posixPermissions: 0o700],
+                ofItemAtPath: cacheDir.path
+            )
+        } catch {
+            logger.error("Cache permission setup failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     struct FetchResult: Sendable {

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.10] - 2026-03-05
+
+### Fixed
+- Cache directory permission setup failures now logged instead of silently ignored
+
 ## [0.0.9] - 2026-03-05
 
 ### Fixed
