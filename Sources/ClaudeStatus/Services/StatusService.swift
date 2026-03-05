@@ -26,6 +26,11 @@ actor StatusService {
             withIntermediateDirectories: true,
             attributes: [.posixPermissions: 0o700]
         )
+        // Enforce permissions on pre-existing directories
+        try? FileManager.default.setAttributes(
+            [.posixPermissions: 0o700],
+            ofItemAtPath: cacheDir.path
+        )
     }
 
     struct FetchResult: Sendable {

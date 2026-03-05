@@ -78,7 +78,10 @@ final class StatusMonitor {
     }
 
     func refresh() async {
-        guard isNetworkAvailable else { return }
+        guard isNetworkAvailable else {
+            isOnline = false
+            return
+        }
 
         let result = await service.fetch()
 
@@ -111,8 +114,13 @@ final class StatusMonitor {
                 let wasAvailable = self.isNetworkAvailable
                 self.isNetworkAvailable = (path.status == .satisfied)
 
+                if !self.isNetworkAvailable {
+                    self.isOnline = false
+                    return
+                }
+
                 // Network restored → immediate refresh
-                if !wasAvailable && self.isNetworkAvailable {
+                if !wasAvailable {
                     await self.refresh()
                 }
             }

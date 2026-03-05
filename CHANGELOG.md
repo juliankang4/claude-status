@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.9] - 2026-03-05
+
+### Fixed
+- Bug fix: offline state now immediately reflected in UI, cache directory permissions enforced on existing installs
+
 ## [0.0.8] - 2026-03-05
 
 ### Fixed
