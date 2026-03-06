@@ -20,6 +20,8 @@ final class StatusMonitor {
     private var uptimeCache: [String: [DayStatus]] = [:]
     private var lastComponentIDs: [String] = []
     private var lastIncidentIDs: [String] = []
+    private var isRefreshing = false
+    private var pendingRefresh = false
 
     private var pathMonitor: NWPathMonitor?
     private var pathMonitorQueue = DispatchQueue(label: "com.julianyoon.claude-status.network")
@@ -78,23 +80,34 @@ final class StatusMonitor {
     }
 
     func refresh() async {
-        guard isNetworkAvailable else {
-            isOnline = false
+        if isRefreshing {
+            pendingRefresh = true
             return
         }
 
-        let result = await service.fetch()
+        isRefreshing = true
+        defer { isRefreshing = false }
 
-        summary = result.summary
-        incidents = result.incidents
-        isOnline = result.isOnline
-        lastRefresh = Date()
+        while true {
+            pendingRefresh = false
 
-        // Rebuild uptime cache off main thread
-        await rebuildUptimeCache()
+            let result = await fetchSnapshot()
 
-        if isOnline, let components = summary?.components {
-            detectChanges(components)
+            summary = result.summary
+            incidents = result.incidents
+            isOnline = isNetworkAvailable && result.isOnline
+            lastRefresh = Date()
+
+            // Rebuild uptime cache off main thread
+            await rebuildUptimeCache()
+
+            if isOnline, let components = summary?.components {
+                detectChanges(components)
+            }
+
+            if !pendingRefresh {
+                break
+            }
         }
     }
 
@@ -156,6 +169,13 @@ final class StatusMonitor {
         let allIncidents = incidents?.incidents ?? []
         let cache = await service.buildUptimeCache(components: comps, incidents: allIncidents)
         uptimeCache = cache
+    }
+
+    private func fetchSnapshot() async -> StatusService.FetchResult {
+        if isNetworkAvailable {
+            return await service.fetch()
+        }
+        return await service.loadCachedSnapshot()
     }
 
     private func detectChanges(_ components: [Component]) {

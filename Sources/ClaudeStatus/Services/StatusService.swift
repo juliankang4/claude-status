@@ -63,6 +63,14 @@ actor StatusService {
         )
     }
 
+    func loadCachedSnapshot() -> FetchResult {
+        FetchResult(
+            summary: loadCache(file: summaryCacheFile, as: SummaryResponse.self),
+            incidents: loadCache(file: incidentsCacheFile, as: IncidentsResponse.self),
+            isOnline: false
+        )
+    }
+
     // MARK: - Uptime Calculation (off main thread)
 
     func buildUptimeCache(
@@ -73,9 +81,11 @@ actor StatusService {
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         let today = calendar.startOfDay(for: Date())
         var cache: [String: [DayStatus]] = [:]
+        let incidentWindowsByComponent = indexIncidentWindows(incidents)
 
         for component in components {
             let startDate = component.startDate.flatMap { dateFormatter.date(from: $0) }
+            let windows = incidentWindowsByComponent[component.id] ?? []
 
             let data: [DayStatus] = (0..<AppConstants.uptimeDays).reversed().map { daysAgo in
                 let day = calendar.date(byAdding: .day, value: -daysAgo, to: today)!
@@ -85,24 +95,7 @@ actor StatusService {
                     return DayStatus(date: day, status: .noData)
                 }
 
-                let impacts = incidents.compactMap { incident -> IncidentImpact? in
-                    let incStart = incident.startedAt.prefix(10)
-                    let incEnd = (incident.resolvedAt ?? "9999-12-31").prefix(10)
-                    guard dayStr >= incStart && dayStr <= incEnd else { return nil }
-
-                    let affected = incident.incidentUpdates.contains { update in
-                        update.affectedComponents?.contains { $0.code == component.id } ?? false
-                    }
-                    return affected ? incident.impact : nil
-                }
-
-                if impacts.isEmpty {
-                    return DayStatus(date: day, status: .operational)
-                } else if impacts.contains(where: { $0 == .major || $0 == .critical }) {
-                    return DayStatus(date: day, status: .major)
-                } else {
-                    return DayStatus(date: day, status: .minor)
-                }
+                return DayStatus(date: day, status: uptimeStatus(for: dayStr, windows: windows))
             }
             cache[component.id] = data
         }
@@ -166,6 +159,12 @@ actor StatusService {
         let online: Bool
     }
 
+    private struct IncidentWindow: Sendable {
+        let startDay: String
+        let endDay: String
+        let impact: IncidentImpact
+    }
+
     private func fetchAndDecode<T: Decodable & Sendable>(
         url: URL,
         cacheFile: URL,
@@ -198,5 +197,42 @@ actor StatusService {
               Date().timeIntervalSince(modified) < AppConstants.cacheMaxAge,
               let data = try? Data(contentsOf: file) else { return nil }
         return try? JSONDecoder().decode(type, from: data)
+    }
+
+    private func indexIncidentWindows(_ incidents: [Incident]) -> [String: [IncidentWindow]] {
+        var index: [String: [IncidentWindow]] = [:]
+
+        for incident in incidents {
+            let window = IncidentWindow(
+                startDay: String(incident.startedAt.prefix(10)),
+                endDay: String((incident.resolvedAt ?? "9999-12-31").prefix(10)),
+                impact: incident.impact
+            )
+
+            let componentIDs = Set(
+                incident.incidentUpdates.flatMap { update in
+                    (update.affectedComponents ?? []).map(\.code)
+                }
+            )
+
+            for componentID in componentIDs {
+                index[componentID, default: []].append(window)
+            }
+        }
+
+        return index
+    }
+
+    private func uptimeStatus(for day: String, windows: [IncidentWindow]) -> UptimeStatus {
+        var hasIncident = false
+
+        for window in windows where day >= window.startDay && day <= window.endDay {
+            hasIncident = true
+            if window.impact == .major || window.impact == .critical {
+                return .major
+            }
+        }
+
+        return hasIncident ? .minor : .operational
     }
 }

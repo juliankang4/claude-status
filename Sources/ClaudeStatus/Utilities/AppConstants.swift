@@ -33,13 +33,58 @@ enum AppConstants {
     static let allowedHosts: Set<String> = [
         "status.claude.com", "stspg.io", "github.com", "www.github.com"
     ]
+    static let redirectValidationHosts: Set<String> = [
+        "stspg.io"
+    ]
 
     static func openIfAllowed(_ raw: String) {
-        guard let url = URL(string: raw),
-              url.scheme?.lowercased() == "https",
-              let host = url.host?.lowercased(),
-              allowedHosts.contains(where: { host == $0 || host.hasSuffix(".\($0)") })
-        else { return }
-        NSWorkspace.shared.open(url)
+        Task {
+            guard let url = await validatedURL(from: raw) else { return }
+            await MainActor.run {
+                _ = NSWorkspace.shared.open(url)
+            }
+        }
+    }
+
+    private static func validatedURL(from raw: String) async -> URL? {
+        guard let url = URL(string: raw), isAllowed(url) else { return nil }
+        guard shouldValidateRedirect(for: url) else { return url }
+        guard let finalURL = await resolveFinalURL(for: url), isAllowed(finalURL) else { return nil }
+        return finalURL
+    }
+
+    private static func resolveFinalURL(for url: URL) async -> URL? {
+        if let resolved = await resolveFinalURL(for: url, method: "HEAD") {
+            return resolved
+        }
+        return await resolveFinalURL(for: url, method: "GET")
+    }
+
+    private static func resolveFinalURL(for url: URL, method: String) async -> URL? {
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.timeoutInterval = apiTimeout
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            return response.url
+        } catch {
+            return nil
+        }
+    }
+
+    private static func shouldValidateRedirect(for url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        return redirectValidationHosts.contains(where: { host == $0 || host.hasSuffix(".\($0)") })
+    }
+
+    private static func isAllowed(_ url: URL) -> Bool {
+        guard url.scheme?.lowercased() == "https",
+              let host = url.host?.lowercased() else {
+            return false
+        }
+
+        return allowedHosts.contains(where: { host == $0 || host.hasSuffix(".\($0)") })
     }
 }

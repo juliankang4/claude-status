@@ -71,7 +71,7 @@ struct IncidentRowView: View {
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundStyle(StatusMapping.incidentColor(for: update.status))
 
-                            Text(cleanHTML(update.body))
+                            Text(HTMLText.plain(update.body))
                                 .font(.system(size: 10))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(4)
@@ -100,17 +100,5 @@ struct IncidentRowView: View {
             }
         }
         .padding(.vertical, 2)
-    }
-
-    private func cleanHTML(_ html: String) -> String {
-        // Remove complete tags and unclosed tags (e.g., "<img src=x onerror=")
-        var text = html.replacingOccurrences(of: "<[^>]*>?", with: "", options: .regularExpression)
-        text = text.replacingOccurrences(of: "&amp;", with: "&")
-        text = text.replacingOccurrences(of: "&lt;", with: "<")
-        text = text.replacingOccurrences(of: "&gt;", with: ">")
-        text = text.replacingOccurrences(of: "&#39;", with: "'")
-        text = text.replacingOccurrences(of: "&quot;", with: "\"")
-        text = text.replacingOccurrences(of: "&#\\d+;", with: "", options: .regularExpression)
-        return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

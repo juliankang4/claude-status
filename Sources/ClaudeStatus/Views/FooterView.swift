@@ -27,9 +27,7 @@ struct FooterView: View {
             HStack(spacing: 12) {
                 // Open status page
                 Button {
-                    if let url = URL(string: "https://status.claude.com") {
-                        NSWorkspace.shared.open(url)
-                    }
+                    AppConstants.openIfAllowed("https://status.claude.com")
                 } label: {
                     HStack(spacing: 4) {
                         Text("🌐")
