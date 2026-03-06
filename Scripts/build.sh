@@ -34,6 +34,16 @@ if command -v xcodegen &>/dev/null && command -v xcodebuild &>/dev/null && xcode
     mkdir -p "$APP_DIR/Contents/Resources"
     cp -n "$PROJECT_DIR/Resources/AppIcon.icns" "$APP_DIR/Contents/Resources/" 2>/dev/null || true
     cp -n "$PROJECT_DIR/Resources/claude-logo.svg" "$APP_DIR/Contents/Resources/" 2>/dev/null || true
+
+    # Re-sign widget with sandbox entitlements (required for WidgetKit gallery)
+    echo "=== Signing with entitlements ==="
+    FRAMEWORK="$APP_DIR/Contents/Frameworks/ClaudeStatusShared.framework"
+    APPEX="$APP_DIR/Contents/PlugIns/ClaudeStatusWidgetExtension.appex"
+    ENTITLEMENTS="$PROJECT_DIR/Resources/WidgetExtension.entitlements"
+
+    codesign --force --sign - "$FRAMEWORK"
+    codesign --force --sign - --entitlements "$ENTITLEMENTS" "$APPEX"
+    codesign --force --sign - "$APP_DIR"
 else
     echo "=== Building with swift build (main app only, no widget) ==="
     BIN_PATH=$(swift build -c release --show-bin-path)

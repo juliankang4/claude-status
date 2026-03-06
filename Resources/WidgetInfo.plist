@@ -9,7 +9,7 @@
     <key>CFBundleDisplayName</key>
     <string>Claude Status Widget</string>
     <key>CFBundleExecutable</key>
-    <string>ClaudeStatusWidget</string>
+    <string>ClaudeStatusWidgetExtension</string>
     <key>CFBundleVersion</key>
     <string>0.1.0</string>
     <key>CFBundleShortVersionString</key>

@@ -58,6 +58,7 @@ targets:
         CODE_SIGN_IDENTITY: "-"
         CODE_SIGN_STYLE: Manual
         GENERATE_INFOPLIST_FILE: false
+        CODE_SIGN_ENTITLEMENTS: Resources/WidgetExtension.entitlements
     dependencies:
       - target: ClaudeStatusShared
         embed: false
