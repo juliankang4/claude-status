@@ -1,4 +1,5 @@
 import SwiftUI
+import ClaudeStatusShared
 
 struct IncidentSectionView: View {
     let incidents: [Incident]

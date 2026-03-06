@@ -1,4 +1,5 @@
 import SwiftUI
+import ClaudeStatusShared
 
 struct UptimeBarView: View {
     let data: [DayStatus]

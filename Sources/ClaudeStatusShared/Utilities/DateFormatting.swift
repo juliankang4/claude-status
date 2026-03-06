@@ -1,14 +1,13 @@
 import Foundation
 
-@MainActor
-enum DateFormatting {
-    private static let fractionalFormatter: ISO8601DateFormatter = {
+package enum DateFormatting {
+    nonisolated(unsafe) private static let fractionalFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return f
     }()
 
-    private static let basicFormatter: ISO8601DateFormatter = {
+    nonisolated(unsafe) private static let basicFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime]
         return f
@@ -28,12 +27,12 @@ enum DateFormatting {
         return f
     }()
 
-    static func parseISO(_ string: String) -> Date? {
+    package static func parseISO(_ string: String) -> Date? {
         if let date = fractionalFormatter.date(from: string) { return date }
         return basicFormatter.date(from: string)
     }
 
-    static func shortDate(_ string: String) -> String {
+    package static func shortDate(_ string: String) -> String {
         guard let date = parseISO(string) else {
             let parts = string.prefix(10).split(separator: "-")
             guard parts.count >= 3 else { return string }
@@ -47,14 +46,14 @@ enum DateFormatting {
         return "\(month)/\(day)"
     }
 
-    static func time(_ date: Date, language: AppLanguage) -> String {
+    package static func time(_ date: Date, language: AppLanguage) -> String {
         let formatter = language == .korean ? timeFormatterKO : timeFormatterEN
         return formatter.string(from: date)
     }
 
     // MARK: - Duration
 
-    static func duration(from startString: String, to endDate: Date?, language: AppLanguage) -> String? {
+    package static func duration(from startString: String, to endDate: Date?, language: AppLanguage) -> String? {
         guard let start = parseISO(startString) else { return nil }
         let end = endDate ?? Date()
         let interval = end.timeIntervalSince(start)

@@ -1,5 +1,6 @@
 import SwiftUI
 import ServiceManagement
+import ClaudeStatusShared
 
 struct SettingsSectionView: View {
     @Bindable var settings: AppSettings

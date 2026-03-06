@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0] - 2026-03-06
+
+### Added
+- Desktop widget (macOS 14+ WidgetKit): small, medium, large sizes with 15-minute auto-refresh
+  - Small: overall status icon + label
+  - Medium: overall status + service list (up to 5)
+  - Large: service list with status labels + recent incidents (up to 3)
+- Widget taps open status.claude.com in browser
+- Bilingual widget: auto-detects system language (Korean/English)
+- xcodegen (project.yml) for reproducible Xcode project generation
+- ClaudeStatusShared framework: shared models, utilities, and localization across app and widget
+
+### Changed
+- Project restructured into 3 targets: ClaudeStatusShared (framework), ClaudeStatus (app), ClaudeStatusWidgetExtension (widget)
+- build.sh now uses xcodebuild when Xcode + xcodegen available; falls back to swift build for menu bar only
+- Version bumped to 0.1.0 (minor version for widget feature)
+
 ## [0.0.11] - 2026-03-06
 
 ### Fixed

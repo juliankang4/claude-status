@@ -1,7 +1,7 @@
 import SwiftUI
 
-enum StatusMapping {
-    static func icon(for status: ComponentStatus) -> String {
+package enum StatusMapping {
+    package static func icon(for status: ComponentStatus) -> String {
         switch status {
         case .operational: "✅"
         case .degradedPerformance: "⚠️"
@@ -11,7 +11,7 @@ enum StatusMapping {
         }
     }
 
-    static func color(for status: ComponentStatus) -> Color {
+    package static func color(for status: ComponentStatus) -> Color {
         switch status {
         case .operational: .green
         case .degradedPerformance: .orange
@@ -21,7 +21,7 @@ enum StatusMapping {
         }
     }
 
-    static func incidentColor(for status: IncidentStatus) -> Color {
+    package static func incidentColor(for status: IncidentStatus) -> Color {
         switch status {
         case .resolved, .postmortem: .green
         case .monitoring, .identified: .orange

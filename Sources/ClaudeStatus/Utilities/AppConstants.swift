@@ -1,11 +1,12 @@
 import Foundation
 import AppKit
+import ClaudeStatusShared
 
 enum AppConstants {
     // MARK: - API
-    static let summaryURL = URL(string: "https://status.claude.com/api/v2/summary.json")!
-    static let incidentsURL = URL(string: "https://status.claude.com/api/v2/incidents.json")!
-    static let apiTimeout: TimeInterval = 10
+    static let summaryURL = SharedConstants.summaryURL
+    static let incidentsURL = SharedConstants.incidentsURL
+    static let apiTimeout = SharedConstants.apiTimeout
 
     // MARK: - Cache
     static let cacheDirectoryName = "ClaudeStatus"
@@ -18,8 +19,8 @@ enum AppConstants {
     static let refreshIntervalOptions: [TimeInterval] = [15, 30, 60, 300]
 
     // MARK: - Display
-    static let maxRecentIncidents = 5
-    static let uptimeDays = 30
+    static let maxRecentIncidents = SharedConstants.maxRecentIncidents
+    static let uptimeDays = SharedConstants.uptimeDays
 
     // MARK: - GitHub
     static let githubRepo = "juliankang4/claude-status"

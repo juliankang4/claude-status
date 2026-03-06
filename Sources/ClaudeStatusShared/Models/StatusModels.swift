@@ -2,17 +2,17 @@ import Foundation
 
 // MARK: - Summary API Response
 
-struct SummaryResponse: Codable, Sendable {
-    let page: PageInfo
-    let components: [Component]
-    let status: OverallStatus
+package struct SummaryResponse: Codable, Sendable {
+    package let page: PageInfo
+    package let components: [Component]
+    package let status: OverallStatus
 }
 
-struct PageInfo: Codable, Sendable {
-    let id: String
-    let name: String
-    let url: String
-    let updatedAt: String
+package struct PageInfo: Codable, Sendable {
+    package let id: String
+    package let name: String
+    package let url: String
+    package let updatedAt: String
 
     enum CodingKeys: String, CodingKey {
         case id, name, url
@@ -20,17 +20,17 @@ struct PageInfo: Codable, Sendable {
     }
 }
 
-struct Component: Codable, Sendable, Identifiable {
-    let id: String
-    let name: String
-    let status: ComponentStatus
-    let createdAt: String
-    let updatedAt: String
-    let position: Int
-    let showcase: Bool
-    let startDate: String?
-    let group: Bool
-    let onlyShowIfDegraded: Bool
+package struct Component: Codable, Sendable, Identifiable {
+    package let id: String
+    package let name: String
+    package let status: ComponentStatus
+    package let createdAt: String
+    package let updatedAt: String
+    package let position: Int
+    package let showcase: Bool
+    package let startDate: String?
+    package let group: Bool
+    package let onlyShowIfDegraded: Bool
 
     enum CodingKeys: String, CodingKey {
         case id, name, status, position, showcase, group
@@ -40,8 +40,7 @@ struct Component: Codable, Sendable, Identifiable {
         case onlyShowIfDegraded = "only_show_if_degraded"
     }
 
-    var displayName: String {
-        // Remove parenthetical suffixes like "(formerly ...)" or "(api....)"
+    package var displayName: String {
         if let parenRange = name.range(of: " (") {
             return String(name[..<parenRange.lowerBound])
         }
@@ -49,32 +48,32 @@ struct Component: Codable, Sendable, Identifiable {
     }
 }
 
-enum ComponentStatus: String, Codable, Sendable {
+package enum ComponentStatus: String, Codable, Sendable {
     case operational
     case degradedPerformance = "degraded_performance"
     case partialOutage = "partial_outage"
     case majorOutage = "major_outage"
     case unknown
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let value = try decoder.singleValueContainer().decode(String.self)
         self = ComponentStatus(rawValue: value) ?? .unknown
     }
 }
 
-struct OverallStatus: Codable, Sendable {
-    let indicator: StatusIndicator
-    let description: String
+package struct OverallStatus: Codable, Sendable {
+    package let indicator: StatusIndicator
+    package let description: String
 }
 
-enum StatusIndicator: String, Codable, Sendable {
+package enum StatusIndicator: String, Codable, Sendable {
     case none
     case minor
     case major
     case critical
     case unknown
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let value = try decoder.singleValueContainer().decode(String.self)
         self = StatusIndicator(rawValue: value) ?? .unknown
     }

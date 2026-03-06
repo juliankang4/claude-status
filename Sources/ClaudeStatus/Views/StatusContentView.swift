@@ -1,4 +1,5 @@
 import SwiftUI
+import ClaudeStatusShared
 
 struct StatusContentView: View {
     let monitor: StatusMonitor

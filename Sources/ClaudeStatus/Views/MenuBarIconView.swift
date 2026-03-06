@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import ClaudeStatusShared
 
 struct MenuBarIconView: View {
     let indicator: StatusIndicator

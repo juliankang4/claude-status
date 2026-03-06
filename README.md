@@ -20,6 +20,7 @@ A native macOS menu bar app that monitors Claude service status in real time.
 - **Safe external links** — Validates short-link redirect targets before opening in the browser
 - **Bilingual** — English / Korean
 - **Launch at Login** — Auto-start on login (toggle on/off)
+- **Desktop widget** — macOS 14+ WidgetKit widget (small/medium/large), 15-min auto-refresh
 - **Hidden from Dock** — No Dock icon or Cmd+Tab entry
 
 ## Installation
@@ -35,7 +36,7 @@ brew install claude-status
 
 Download the latest `.app.zip` from [Releases](https://github.com/juliankang4/claude-status/releases), unzip, and move to `/Applications/`.
 
-### Build from source (No Xcode required)
+### Build from source
 
 ```bash
 git clone https://github.com/juliankang4/claude-status.git
@@ -47,7 +48,7 @@ cd claude-status
 
 - macOS 14 (Sonoma) or later
 - Apple Silicon (arm64)
-- For building from source: Swift 6+ (Command Line Tools)
+- For building from source: Swift 6+ (Command Line Tools for menu bar only; Xcode + xcodegen for widget)
 
 ## Data Source
 
@@ -83,6 +84,7 @@ macOS 메뉴바에서 Claude 서비스 상태를 실시간으로 확인하는 �
 - **안전한 외부 링크** — 단축 링크의 최종 이동 주소를 검증한 뒤 브라우저로 열기
 - **다국어** — 한국어/영어 전환
 - **시작프로그램** — 로그인 시 자동 실행 (켜기/끄기 가능)
+- **데스크톱 위젯** — macOS 14+ WidgetKit 위젯 (소/중/대), 15분 자동 갱신
 - **Dock 숨김** — Dock과 Cmd+Tab에 표시되지 않음
 
 ### 설치

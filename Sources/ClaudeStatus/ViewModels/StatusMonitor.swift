@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Network
+import ClaudeStatusShared
 
 @Observable
 @MainActor

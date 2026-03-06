@@ -1,14 +1,14 @@
 import Foundation
 
-enum L10n {
-    static func get(_ key: StringKey, language: AppLanguage) -> String {
+package enum L10n {
+    package static func get(_ key: StringKey, language: AppLanguage) -> String {
         switch language {
         case .korean: key.ko
         case .english: key.en
         }
     }
 
-    enum StringKey {
+    package enum StringKey {
         case title
         case recentIncidents
         case noIncidents
@@ -89,7 +89,7 @@ enum L10n {
         }
     }
 
-    static func statusLabel(_ status: ComponentStatus, language: AppLanguage) -> String {
+    package static func statusLabel(_ status: ComponentStatus, language: AppLanguage) -> String {
         switch language {
         case .korean:
             switch status {
@@ -110,11 +110,9 @@ enum L10n {
         }
     }
 
-    /// Translate incident name to Korean when language is set to ko
-    static func translateIncidentName(_ name: String, language: AppLanguage) -> String {
+    package static func translateIncidentName(_ name: String, language: AppLanguage) -> String {
         guard language == .korean else { return name }
 
-        // Known word translations (applied to the whole string at the end)
         let wordMap: [(String, String)] = [
             ("Usage Reporting", "사용량 보고"),
             ("usage reporting", "사용량 보고"),
@@ -124,7 +122,6 @@ enum L10n {
             ("Elevated error rate", "오류율 증가"),
         ]
 
-        // "Prefix <target>" patterns → "<target> 한국어설명"
         let prefixPatterns: [(String, String)] = [
             ("Elevated errors on ", " 오류 증가"),
             ("Elevated errors in ", " 오류 증가"),
@@ -149,7 +146,6 @@ enum L10n {
             }
         }
 
-        // No prefix matched — try word-level translation
         return translateWords(name, wordMap: wordMap)
     }
 
@@ -161,7 +157,7 @@ enum L10n {
         return result
     }
 
-    static func incidentLabel(_ status: IncidentStatus, language: AppLanguage) -> String {
+    package static func incidentLabel(_ status: IncidentStatus, language: AppLanguage) -> String {
         switch language {
         case .korean:
             switch status {
@@ -182,7 +178,7 @@ enum L10n {
         }
     }
 
-    static func refreshIntervalLabel(_ interval: TimeInterval, language: AppLanguage) -> String {
+    package static func refreshIntervalLabel(_ interval: TimeInterval, language: AppLanguage) -> String {
         let seconds = Int(interval)
         switch language {
         case .korean:

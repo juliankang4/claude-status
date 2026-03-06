@@ -3,24 +3,25 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleIdentifier</key>
-    <string>com.julianyoon.claude-status</string>
+    <string>com.julianyoon.claude-status.widget</string>
     <key>CFBundleName</key>
-    <string>Claude Status</string>
+    <string>ClaudeStatusWidget</string>
     <key>CFBundleDisplayName</key>
-    <string>Claude Status</string>
+    <string>Claude Status Widget</string>
     <key>CFBundleExecutable</key>
-    <string>ClaudeStatus</string>
+    <string>ClaudeStatusWidget</string>
     <key>CFBundleVersion</key>
     <string>0.1.0</string>
     <key>CFBundleShortVersionString</key>
     <string>0.1.0</string>
-    <key>CFBundleIconFile</key>
-    <string>AppIcon</string>
     <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>LSUIElement</key>
-    <true/>
+    <string>XPC!</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
+    <key>NSExtension</key>
+    <dict>
+        <key>NSExtensionPointIdentifier</key>
+        <string>com.apple.widgetkit-extension</string>
+    </dict>
 </dict>
 </plist>

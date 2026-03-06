@@ -1,4 +1,5 @@
 import SwiftUI
+import ClaudeStatusShared
 
 struct ServiceRowView: View {
     let component: Component

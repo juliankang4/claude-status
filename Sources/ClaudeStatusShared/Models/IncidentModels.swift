@@ -2,23 +2,23 @@ import Foundation
 
 // MARK: - Incidents API Response
 
-struct IncidentsResponse: Codable, Sendable {
-    let page: PageInfo
-    let incidents: [Incident]
+package struct IncidentsResponse: Codable, Sendable {
+    package let page: PageInfo
+    package let incidents: [Incident]
 }
 
-struct Incident: Codable, Sendable, Identifiable {
-    let id: String
-    let name: String
-    let status: IncidentStatus
-    let createdAt: String
-    let updatedAt: String
-    let monitoringAt: String?
-    let resolvedAt: String?
-    let impact: IncidentImpact
-    let shortlink: String
-    let startedAt: String
-    let incidentUpdates: [IncidentUpdate]
+package struct Incident: Codable, Sendable, Identifiable {
+    package let id: String
+    package let name: String
+    package let status: IncidentStatus
+    package let createdAt: String
+    package let updatedAt: String
+    package let monitoringAt: String?
+    package let resolvedAt: String?
+    package let impact: IncidentImpact
+    package let shortlink: String
+    package let startedAt: String
+    package let incidentUpdates: [IncidentUpdate]
 
     enum CodingKeys: String, CodingKey {
         case id, name, status, impact, shortlink
@@ -31,12 +31,12 @@ struct Incident: Codable, Sendable, Identifiable {
     }
 }
 
-struct IncidentUpdate: Codable, Sendable {
-    let id: String
-    let status: IncidentStatus
-    let body: String
-    let createdAt: String
-    let affectedComponents: [AffectedComponent]?
+package struct IncidentUpdate: Codable, Sendable {
+    package let id: String
+    package let status: IncidentStatus
+    package let body: String
+    package let createdAt: String
+    package let affectedComponents: [AffectedComponent]?
 
     enum CodingKeys: String, CodingKey {
         case id, status, body
@@ -45,11 +45,11 @@ struct IncidentUpdate: Codable, Sendable {
     }
 }
 
-struct AffectedComponent: Codable, Sendable {
-    let code: String
-    let name: String
-    let oldStatus: String
-    let newStatus: String
+package struct AffectedComponent: Codable, Sendable {
+    package let code: String
+    package let name: String
+    package let oldStatus: String
+    package let newStatus: String
 
     enum CodingKeys: String, CodingKey {
         case code, name
@@ -58,7 +58,7 @@ struct AffectedComponent: Codable, Sendable {
     }
 }
 
-enum IncidentStatus: String, Codable, Sendable {
+package enum IncidentStatus: String, Codable, Sendable {
     case investigating
     case identified
     case monitoring
@@ -66,20 +66,20 @@ enum IncidentStatus: String, Codable, Sendable {
     case postmortem
     case unknown
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let value = try decoder.singleValueContainer().decode(String.self)
         self = IncidentStatus(rawValue: value) ?? .unknown
     }
 }
 
-enum IncidentImpact: String, Codable, Sendable {
+package enum IncidentImpact: String, Codable, Sendable {
     case none
     case minor
     case major
     case critical
     case unknown
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let value = try decoder.singleValueContainer().decode(String.self)
         self = IncidentImpact(rawValue: value) ?? .unknown
     }

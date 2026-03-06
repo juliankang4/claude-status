@@ -1,4 +1,5 @@
 import Foundation
+import ClaudeStatusShared
 
 enum HTMLText {
     static func plain(_ html: String) -> String {

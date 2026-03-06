@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import ClaudeStatusShared
 
 actor StatusService {
     private let logger = Logger(subsystem: "com.julianyoon.claude-status", category: "StatusService")

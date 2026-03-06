@@ -1,0 +1,63 @@
+name: ClaudeStatus
+options:
+  bundleIdPrefix: com.julianyoon
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "26.3"
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_PACKAGE_NAME: ClaudeStatus
+
+targets:
+  ClaudeStatusShared:
+    type: framework
+    platform: macOS
+    sources:
+      - path: Sources/ClaudeStatusShared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.julianyoon.claude-status.shared
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        PRODUCT_MODULE_NAME: ClaudeStatusShared
+        GENERATE_INFOPLIST_FILE: true
+
+  ClaudeStatus:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/ClaudeStatus
+    settings:
+      base:
+        INFOPLIST_FILE: Resources/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.julianyoon.claude-status
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        LS_UI_ELEMENT: YES
+        GENERATE_INFOPLIST_FILE: false
+    resources:
+      - path: Resources/AppIcon.icns
+      - path: Resources/claude-logo.svg
+    dependencies:
+      - target: ClaudeStatusShared
+        embed: true
+      - target: ClaudeStatusWidgetExtension
+        embed: true
+
+  ClaudeStatusWidgetExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: Sources/ClaudeStatusWidget
+    settings:
+      base:
+        INFOPLIST_FILE: Resources/WidgetInfo.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.julianyoon.claude-status.widget
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        GENERATE_INFOPLIST_FILE: false
+    dependencies:
+      - target: ClaudeStatusShared
+        embed: false

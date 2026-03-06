@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import ClaudeStatusShared
 
 actor NotificationService {
     private var authorized = false

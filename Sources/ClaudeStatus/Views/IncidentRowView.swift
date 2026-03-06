@@ -1,4 +1,5 @@
 import SwiftUI
+import ClaudeStatusShared
 
 struct IncidentRowView: View {
     let incident: Incident

@@ -1,4 +1,5 @@
 import SwiftUI
+import ClaudeStatusShared
 
 struct FooterView: View {
     let isOnline: Bool

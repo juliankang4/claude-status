@@ -1,5 +1,6 @@
 import SwiftUI
 import Carbon.HIToolbox
+import ClaudeStatusShared
 
 @main
 struct ClaudeStatusApp: App {

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import ClaudeStatusShared
 
 @Observable
 @MainActor
@@ -52,9 +53,4 @@ final class AppSettings {
             self.mutedServices = []
         }
     }
-}
-
-enum AppLanguage: String, Sendable {
-    case english = "en"
-    case korean = "ko"
 }
