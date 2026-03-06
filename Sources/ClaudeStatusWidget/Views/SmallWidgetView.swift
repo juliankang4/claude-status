@@ -6,19 +6,20 @@ struct SmallWidgetView: View {
     let entry: StatusEntry
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Image(systemName: iconName)
-                .font(.system(size: 32, weight: .medium))
+                .font(.system(size: 40, weight: .medium))
                 .foregroundStyle(WidgetColors.indicatorColor(for: entry.indicator))
+                .shadow(color: WidgetColors.indicatorColor(for: entry.indicator).opacity(0.4), radius: 6)
 
             Text(WidgetLabels.overallStatus(for: entry.indicator, language: entry.language))
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 15, weight: .bold))
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
 
             Text("Claude")
-                .font(.system(size: 10))
-                .foregroundStyle(.secondary)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(WidgetColors.brand)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .widgetURL(URL(string: "https://status.claude.com"))

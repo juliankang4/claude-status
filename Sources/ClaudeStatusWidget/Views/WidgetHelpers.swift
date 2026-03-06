@@ -2,6 +2,9 @@ import SwiftUI
 import ClaudeStatusShared
 
 enum WidgetColors {
+    // Claude brand color
+    static let brand = Color(red: 0.85, green: 0.47, blue: 0.34) // #D97757
+
     static func indicatorColor(for indicator: StatusIndicator) -> Color {
         switch indicator {
         case .none: .green
@@ -14,6 +17,16 @@ enum WidgetColors {
 
     static func componentColor(for status: ComponentStatus) -> Color {
         StatusMapping.color(for: status)
+    }
+
+    static func statusBackground(for indicator: StatusIndicator) -> Color {
+        switch indicator {
+        case .none: .green.opacity(0.12)
+        case .minor: .orange.opacity(0.12)
+        case .major: Color(red: 1.0, green: 0.4, blue: 0.0).opacity(0.12)
+        case .critical: .red.opacity(0.12)
+        case .unknown: .gray.opacity(0.12)
+        }
     }
 }
 

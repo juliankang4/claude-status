@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2026-03-06
+
+### Changed
+- Widget UI redesign: larger fonts (11-16pt), status banner with color tint, icon glow effect, Claude brand color accent, colored incident status labels, improved spacing and information density
+
 ## [0.1.0] - 2026-03-06
 
 ### Added
