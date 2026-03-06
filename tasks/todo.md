@@ -8,7 +8,10 @@
 - [x] HTML 본문 처리 유틸 분리
 - [x] CHANGELOG / DEVLOG / README 업데이트
 - [x] 빌드 및 실행 검증
-- [ ] git 커밋 및 푸시
+- [x] git 커밋 및 푸시
+- [x] 버전 0.0.11 반영
+- [x] 릴리즈용 앱 zip 생성
+- [ ] GitHub 태그/릴리즈 생성
 
 ## Review
 
@@ -19,3 +22,5 @@
 - [x] `swift build` 통과
 - [x] `./Scripts/build.sh` 통과
 - [x] 빌드된 앱 실행 후 프로세스 확인
+- [x] 설치된 앱 버전 `0.0.11` 확인
+- [x] 릴리즈 zip 생성 확인

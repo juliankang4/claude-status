@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - 2026-03-06
+## [0.0.11] - 2026-03-06
 
 ### Fixed
 - Bug fixes and stability improvements: offline refresh now loads cached snapshots, overlapping refresh requests are coalesced, short-link redirects are validated before opening, uptime cache building avoids repeated full incident scans, and incident HTML text parsing moved into a shared utility.
